@@ -6,7 +6,7 @@ export default {
   getEnum(data) {
     return request({
       url: `/dict/search/${data}`,
-      method: "get"
+      method: "GET"
     });
   },
 
@@ -39,7 +39,7 @@ export default {
   getVal(url) {
     return request({
       url: `/${url}`,
-      method: "get"
+      method: "GET"
     });
   },
 
@@ -49,6 +49,32 @@ export default {
       url: `/${url}`,
       method: "POST",
       data: rule
+    });
+  },
+
+  // 查询汇率
+  getExchangeRateBank(date) {
+    return request({
+      url: `exchangerate/${date}`,
+      method: "GET"
+    });
+  },
+
+  // 委托订单-新增
+  addEntrustorderData(data) {
+    return request({
+      url: '/entrustorder/',
+      method: "POST",
+      data
+    });
+  },
+
+  // 委托订单-修改
+  editEntrustorderData(data) {
+    return request({
+      url: '/entrustorder/',
+      method: "PUT",
+      data
     });
   },
 

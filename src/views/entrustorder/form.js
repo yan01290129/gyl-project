@@ -1,7 +1,7 @@
 let rules = {
   required: true,
   message: "不能为空",
-  trigger: "blur,change"
+  trigger: ['blur', 'change']
 };
 export default [
   {
@@ -251,7 +251,8 @@ export default [
         label: "服务费率(%)",
         type: "num",
         ratio:true,
-        disabled: true
+        disabled: true,
+        rules
       },
       {
         name: "orderExchangeRate",

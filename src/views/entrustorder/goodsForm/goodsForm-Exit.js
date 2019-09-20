@@ -191,84 +191,27 @@ export default [
         label: "监管条件",
         readonly: true,
       },
+    ]
+  },
+  {
+    title: "服务费",
+    items: [
       {
-        name: "customsExchangeRate",
-        label: "订单汇率",
-        type: "num",
-        decimal:6,
-        disabled: true
-      },
-      {
-        name: "customTaxRate",
-        label: "关税税率(%)",
+        name: "serviceExchangeRate",
+        label: "费率(%)",
         type: "num",
         ratio:true,
       },
       {
-        name: "increaseTaxRate",
-        label: "关税加征(%)",
-        type: "num",
-        ratio:true,
-      },
-      {
-        name: "customTaxAmount",
-        label: "关税税额",
-        type: "money",
-        decimal:2,
-        symbol:'￥',
-        disabled: true,
-      },
-      {
-        name: "exciseTaxRate",
-        label: "消费税率(%)",
-        type: "num",
-        ratio:true,
-      },
-      {
-        name: "exciseTax",
-        label: "消费税额",
-        type: "money",
-        decimal:2,
-        symbol:'￥',
-        disabled: true,
-      },
-      {
-        name: "exciseTaxRate",
+        name: "serviceCurrency",
         type: "select",
-        label: "进口增值税率",
-        selectapi: "valueAddedTax",
-      },
-      {
-        name: "vatTaxAmount",
-        label: "进口增值税额",
-        type: "money",
-        decimal:2,
-        symbol:'￥',
+        label: "币别",
+        selectapi: "currencyName",
         disabled: true,
       },
       {
-        name: "taxTypeName",
-        type: "inputbutton",
-        label: "其他税种",
-        readonly: true,
-      },
-      {
-        name: "otherTaxRate",
-        label: "其他税率(%)",
-        type: "num",
-        ratio:true,
-      },
-      {
-        name: "otherTaxAmount",
-        label: "其他税金",
-        type: "money",
-        decimal:2,
-        symbol:'￥',
-        disabled: true,
-      },
-      {
-        name: "priceTax",
-        label: "价税合计",
+        name: "serviceFee",
+        label: "服务费",
         type: "money",
         decimal:2,
         symbol:'￥',
@@ -277,8 +220,103 @@ export default [
     ]
   },
   {
-    title: "委托方",
+    title: "买方采购",
     items: [
+      {
+        name: "buyerExchangeRate",
+        label: "货款汇率",
+        type: "num",
+        decimal:6,
+        disabled: true
+      },
+      {
+        name: "buyerCurrency",
+        type: "select",
+        label: "币别",
+        selectapi: "currencyName",
+        disabled: true,
+      },
+      {
+        name: "buyerRate",
+        label: "买方汇率",
+        type: "num",
+        decimal:6,
+        disabled: true
+      },
+      {
+        name: "buyerPrice",
+        label: "单价",
+        type: "money",
+        disabled: true,
+      },
+      {
+        name: "buyerGoodsValue",
+        label: "货价(货值)",
+        type: "money",
+        disabled: true,
+      },
+    ]
+  },
+  {
+    title: "出口退税",
+    items: [
+      {
+        name: "drawbackRate",
+        label: "退税率(%)",
+        type: "num",
+        ratio:true,
+      },
+      {
+        name: "drawback",
+        label: "退税金额",
+        type: "money",
+        disabled: true,
+      },
+    ]
+  },
+  {
+    title: "",
+    items: [
+      {
+        name: "volume",
+        type: "input",
+        label: "体积(CBM)",
+      },
+      {
+        name: "poNo",
+        type: "input",
+        label: "客户采购订单号",
+      },
+      {
+        name: "materialCode",
+        type: "input",
+        label: "委托方物料编码",
+      },
+      {
+        name: "materialName",
+        type: "input",
+        label: "委托方物料名称",
+      },
+      {
+        name: "clientModel",
+        type: "input",
+        label: "委托方规格型号",
+      },
+      {
+        name: "batchNo",
+        type: "input",
+        label: "批号",
+      },
+      {
+        name: "transactionUnit",
+        type: "input",
+        label: "成交单位",
+      },
+      {
+        name: "threeCproject",
+        type: "input",
+        label: "3C项目",
+      },
     ]
   }
 ];

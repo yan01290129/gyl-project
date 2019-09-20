@@ -12,7 +12,8 @@
             <template v-for="(item, e) in config.items">
               <template v-if="item.none !== true">
                 <template v-if="config.text !== true">
-                  <el-form-item :key="e" v-show="item.disab !== true" :rules="item.disabled !== true ? item.rules : []" class='form-item' :label="item.label" :class='item.big?"form-item-big":item.long?"form-item-long":""'>
+                  <!---rules没有时选取null，解决数字框校验‘is not string’---->
+                  <el-form-item :key="e" v-show="item.disab !== true" :prop="item.name" :rules="item.disabled !== true ? item.rules : null" class='form-item' :label="item.label" :class='item.big?"form-item-big":item.long?"form-item-long":""'>
                     <!-- 输入框/点选框/下拉输入框 -->
                     <el-input v-if='item.type == "input" || item.type == "inputbutton" || item.type == "inputselect"' v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' @change='inputChange(data,item)' :placeholder="item.placeholder || '请输入内容'">
                       <el-button v-if="item.type == 'inputbutton' && item.disabled !== true" slot="append" icon="el-icon-search" @click="pointSelection(data,item)"></el-button>
@@ -37,7 +38,7 @@
                       <el-checkbox v-for="(option,index) in item.options" :key="index" :label="option['value']">{{option['label']}}</el-checkbox>
                     </el-checkbox-group>
                     <!-- （下拉）数字框[支持计算] -->
-                    <number-input v-if="item.type=='num' || item.type=='numselect'" v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入数字'">
+                    <number-input v-if="item.type=='num' || item.type=='numselect'" v-model.number="data[item.name]"  type="number" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入数字'">
                       <el-select v-if="item.type=='numselect'" slot="prepend" v-model="data[item.selsect]" :disabled="item.selsectDisabled" @change='selectChange(data,item)' :placeholder="item.placeholder || '请选择'">
                         <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
                       </el-select>
@@ -140,7 +141,7 @@ export default {
     },
 		operation(val) {
 			this.$emit("handlerOperation", val);
-		},
+    },
   }
 };
 </script>

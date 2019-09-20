@@ -38,11 +38,11 @@ export default {
   },
   methods: {
     // 显示指定格式
-    getVal(num){
-      if(!num){
+    getVal(value){
+      if(!value){
         this.data = ''
       }else{
-        this.data = parseFloat(parseFloat(num).toFixed(this.decimal))
+        this.data = value.toString()
       }
     },
     // 文本框失去焦点
@@ -63,6 +63,8 @@ export default {
       immediate: true
     },
   },
+  created(){
+  }
 };
 </script>
 <style scoped>

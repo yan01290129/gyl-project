@@ -59,9 +59,38 @@ export default [
     title: "进口",
     items: [
       {
-        name: "clientName",
+        name: "receiveUnitType",
+        type: "select",
+        label: "收货单位类型",
+        selectapi: "receiveUnitType",
+				rules,
+      },
+      {
+        name: "receiveUnitName",
         type: "inputbutton",
-        label: "委托方"
+        label: "收货单位",
+        readonly: true,
+				rules,
+      },
+      {
+        name: "importPortName",
+        type: "select",
+        label: "进口口岸",
+        selectapi: "entryPort",
+      },
+      {
+        name: "sellerType",
+        type: "select",
+        label: "报关卖方类型",
+        selectapi: "receiveUnitType",
+				rules,
+      },
+      {
+        name: "sellerName",
+        type: "inputbutton",
+        label: "报关合同卖方",
+        readonly: true,
+				rules,
       },
     ]
   },
@@ -69,15 +98,55 @@ export default [
     title: "出口",
     items: [
       {
-        name: "supplierName",
-        type: "inputbutton",
-        label: "供应商"
+        name: "sendUnitType",
+        type: "select",
+        label: "发货单位类型",
+        selectapi: "receiveUnitType",
+				rules,
       },
       {
-        name: "select",
+        name: "sendUnitName",
+        type: "inputbutton",
+        label: "发货单位",
+        readonly: true,
+				rules,
+      },
+      {
+        name: "importExportHandoverMode",
         type: "select",
-        label: "下拉框",
-        selectapi: "entrustOrderTypeG"
+        label: "FCL/LCF",
+        selectapi: "importExportHandoverMode",
+      },
+      {
+        name: "exportPort",
+        type: "select",
+        label: "出口口岸",
+        selectapi: "entryPort",
+      },
+      {
+        name: "customsBuyerType",
+        type: "select",
+        label: "报关买方类型",
+        selectapi: "receiveUnitType",
+				rules,
+      },
+      {
+        name: "customsContractBuyerName",
+        type: "inputbutton",
+        label: "报关合同买方",
+        readonly: true,
+				rules,
+      },
+      {
+        name: "containerNumber",
+        type: "input",
+        label: "柜型及数量",
+      },
+      {
+        name: "arrivalCountryName",
+        type: "inputbutton",
+        label: "抵运国",
+        readonly: true,
       },
     ]
   }

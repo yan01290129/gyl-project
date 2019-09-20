@@ -130,7 +130,9 @@ const TABLE_WRITE = {
     followPersonName: "orderFollowerName",
     clientContactName: "",
     // clientTel: "",
-    // clientPhone: ""
+    // clientPhone: "",
+    agreementCode: "",
+    agreementName: ""
   },
   clientContactName: {
     clientContactName: "leader",

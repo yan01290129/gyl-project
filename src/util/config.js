@@ -53,7 +53,7 @@ export default {
   },
 
   /**
-   * @param {名称} 设置表单下拉数据
+   * @param {名称} 设置表单下拉字典数据
    */
   async setConfigFormSelect(configs) {
     for await (let config of configs) {
@@ -86,16 +86,6 @@ export default {
   },
 
   /**
-   * @param {名称} 修改表单为查看类型
-   */
-  setConfigFormOfText(configs) {
-    for (let config of configs) {
-      config.text = true
-    }
-    return configs
-  },
-
-  /**
    * @param {名称} 获取栏位配置
    */
   getConfigForm(configs, params) {
@@ -104,6 +94,30 @@ export default {
         if(item.name == params) return item
       }
     }
+  },
+
+  /**
+   * @param {名称} 修改栏位配置
+   */
+  setConfigForm(configs, params, newItem) {
+    for (let config of configs) {
+      for(let i=0;i<config.items.length;i++){
+        if(config.items[i].name == params){
+          config.items[i] = {...config.items[i],...newItem}
+        }
+      }
+    }
+    return configs
+  },
+
+  /**
+   * @param {名称} 修改表单为查看类型
+   */
+  setConfigFormOfText(configs) {
+    for (let config of configs) {
+      config.text = true
+    }
+    return configs
   },
 
   /**
@@ -121,6 +135,29 @@ export default {
           } 
         }
       }
+    }
+  },
+
+  /**
+   * @param {名称} 查询汇率
+   */
+  async getExchangeRate(data,currency){
+    if (currency == "人民币") {
+      return 1;
+    }
+    try {
+      const list = await api.getExchangeRateBank(data)
+      for (let i = 0; i < list.length; i++) {
+        var exchangerate = ''
+        list.forEach(b => {
+          if (currency == b.currency) {
+            exchangerate = b.cenPrice;
+          }
+        });
+        return parseFloat(exchangerate);
+      }
+    } catch (e) {
+      console.log(e);
     }
   },
 

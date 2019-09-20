@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-page-header @back="goBack" content="委托订单列表" class="header"></el-page-header>
-    <data-form v-loading='loading' :data.sync="data" :configs.sync="configs" :operationConfigs='optionConfigs' @handlerOperation='operation' @handlerPointSelection='pointSelection'>
+    <data-form ref="mainform" v-loading='loading' :data.sync="data" :configs.sync="configs" :operationConfigs='optionConfigs' @handlerOperation='operation' @handlerPointSelection='pointSelection'>
       <template v-slot>
         <div class="formHead">{{formHead}}</div>
       </template>
@@ -10,8 +10,8 @@
       <el-tab-pane label="商品信息" name="goods">
         <data-table v-loading='goods.loading' :data.sync="goods.data" :count.sync="goods.count" :configs.sync="goods.configs" :ruleData.sync="goods.ruleData" :noneRules='true' :operationConfigs='goods.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
       </el-tab-pane>
-      <el-tab-pane label="报关信息" name="custom">
-        <data-form v-loading='custom.loading' :data.sync="custom.data" :configs.sync="custom.configs" :operationConfigs='custom.optionConfigs' @handlerOperation='childFormOperation' @handlerPointSelection='childPointSelection'></data-form>
+      <el-tab-pane label="报关信息" name="custom" v-if="data.entrustOrderType == '1' || data.entrustOrderType == '2'">
+        <data-form v-loading='custom.loading' :data.sync="custom.data" :configs="customConfigsFormfile" :operationConfigs='custom.optionConfigs' @handlerOperation='childFormOperation' @handlerPointSelection='childPointSelection'></data-form>
       </el-tab-pane>
       <el-tab-pane label="买方接货信息" name="buyer">
         <data-table v-loading='buyer.loading' :data.sync="buyer.data" :count.sync="buyer.count" :configs.sync="buyer.configs" :ruleData.sync="buyer.ruleData" :noneRules='true' :operationConfigs='buyer.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
@@ -40,7 +40,7 @@
     </el-tabs>
     <data-form v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
     <data-table-dialog v-loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
-    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs.sync='goodformDialog.configs' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperation' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
+    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperation' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
   </div>
 </template>
 
@@ -66,11 +66,16 @@
 	import detailConfigs from "./detailTable";
 	// 表单 
 	import customConfigsForm from "./customForm";
+	import customImportedConfigsForm from "./customForm/customForm-Imported";
+	import customExitConfigsForm from "./customForm/customForm-Exit";
 	// 弹窗表单
 	import DataFormDialog from "@/components/Model/dataFormDialog.vue";
 	import DataTableDialog from "@/components/Model/dataTableDialog.vue";
 	import childoptionDialog from "./opformDialog";
 	import goodsConfigsForm from "./goodsForm";
+	import goodsImportedConfigsForm from "./goodsForm/goodsForm-Imported";
+	import goodsExitConfigsForm from "./goodsForm/goodsForm-Exit";
+	import goodsDomesticConfigsForm from "./goodsForm/goodsForm-Domestic";
 	
 	export default {
 		components: {
@@ -101,7 +106,7 @@
 				loading:false,
 				optionConfigs: [{ label: "保存", event: "save", type: "primary" }],
 				data:{},
-				configs:JSON.parse(JSON.stringify(customConfigsForm)),
+				configs:customConfigsForm,
 			},
 			buyer:{
 				loading:false,
@@ -190,8 +195,9 @@
 				loading:false,
 				optionConfigs:childoptionDialog,
 				data:{},
-				configs:goodsConfigsForm,
+				configs:goodsConfigsForm,//
 			},
+			writeback:false // 回写
 		}),
   		computed: {
 			// 状态
@@ -231,6 +237,32 @@
 					}
 				}
 			},
+			// 商品表单
+			goodsConfigsFormfile(){
+				if(this.data.entrustOrderType == '1'){
+					return goodsImportedConfigsForm
+				}
+				if(this.data.entrustOrderType == '2'){
+					return goodsExitConfigsForm
+				}
+				return goodsDomesticConfigsForm
+			},
+			customConfigsFormfile(){
+				if(this.data.entrustOrderType == '1'){
+					if(this.status == '2'){
+						return utils.setConfigFormOfText(JSON.parse(JSON.stringify(customImportedConfigsForm)))
+					}else{
+						return customImportedConfigsForm
+					}
+				}
+				if(this.data.entrustOrderType == '2'){
+					if(this.status == '2'){
+						return utils.setConfigFormOfText(JSON.parse(JSON.stringify(customExitConfigsForm)))
+					}else{
+						return customExitConfigsForm
+					}
+				}
+			},
 		},
 		methods: {
 			// 返回
@@ -258,7 +290,23 @@
 			// 操作按钮事件
 			operation(val){
 				if(val == 'save'){
-					this.$message({ message: '保存', type: 'success',center: true });
+					this.$refs['mainform'].$refs['form'].validate(async (valid) => {
+						if (valid) {
+							try {
+								this.loading = true
+								const data = this.status ? await api.editEntrustorderData(this.data) : await api.addEntrustorderData(this.data)
+								this.$message({ message: '保存成功', type: 'success',center: true });
+								this.data = data
+							} catch (error) {
+								this.$message({ message: '保存失败', type: 'warning',center: true });
+								return Promise.reject(error)
+							} finally {
+								this.loading = false
+							}
+						} else {
+							return false;
+						}
+					});
 				}
 				if(val == 'sub'){
 					this.$message({ message: '提交', type: 'success',center: true });
@@ -285,7 +333,7 @@
 			async childGetTableList(activeName) {
 				try {
 					this[activeName].loading = true
-					let { list, count } = await utils.getConfigTable(this[activeName].configs.api, this[activeName].ruleData)
+					const { list, count } = await utils.getConfigTable(this[activeName].configs.api, this[activeName].ruleData)
 					this[activeName].data = list
 					this[activeName].count = count
 				} catch (error) {
@@ -364,33 +412,46 @@
 				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.changeSelectionTable(this.tableDialog.item, this.tableDialog.ruleData)}
 				this.tableDialog.loading = false
 			},
+			// 选中行
 			tableDialogcurrentSelected(currentRow){
 				this.tableDialog.currentRow = currentRow
 			},
+			// 操作
 			async tableDialogOperation(val){
 				if(val == 'confirm'){
 					if((!this.tableDialog.currentRow) || JSON.stringify(this.tableDialog.currentRow) == '{}'){
 						return this.$message({ message: '请选择数据', type: 'warning',center: true });
 					}
-					var writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow)
+					const writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow)
 					this.data = {...this.data,...writeVla}
 					this.tableDialog.visible = false
 				}
 				if(val == 'cancel'){
 					this.tableDialog.visible = false
 				}
-			},
-
-			
+			}
 		},
 		created(){
 			// 初始化配置
 			this.data = utils.inntForm(this.data,this.configs)
 			this.loadConfigSelect()
-			// 回写
+			// ------状态对应回写
+			// 修改
 			this.data = {...this.$route.params}
-			// 数据状态
-			this.status == '2' && (this.configs = [...utils.setConfigFormOfText(this.configs)], this.optionConfigs = [],this.configsOthor = [...utils.setConfigFormOfText(this.configsOthor)])
+			// 新增
+			if(!this.status){
+				this.data.trusteeCode = "GSXX2019072300015"
+				this.data.trusteeName = "深圳市讯宇供应链管理有限公司"
+				//-----????????? 采购组织默认操作人
+				this.data.signDate = new Date().toJSON().slice(0, 10) + " 00:00:00";
+				// 委托订单号 显示
+				utils.setConfigForm(this.configs,'entrustOrderNo',{disab:true})
+				
+			}
+			// 提交
+			this.status == '2' && (this.configs = [...utils.setConfigFormOfText(this.configs)], this.optionConfigs = [],this.configsOthor = [...utils.setConfigFormOfText(this.configsOthor)],this.custom.optionConfigs = [])
+		},
+		mounted(){
 		},
 		watch:{
 			tabIsDisabled(newVal, oldVal){
@@ -409,7 +470,7 @@
 					// 表格限制操作
 					this.status == '2' && (this.goods.optionConfigs = [],this.trusteepanyment.optionConfigs = [])
 					// 初始化表单
-					this.custom.data = utils.inntForm(this.custom.data,this.custom.configs) // this.custom.configs = [[...customConfigsForm][0],[...customConfigsForm][1]]
+					this.custom.data = utils.inntForm(this.custom.data,this.custom.configs)
 					this.loadConfigSelect('custom')
 					// 回写表单
 					this.childloadConfigSelect()
@@ -519,6 +580,42 @@
 					}
 				},
 				deep: true
+			},
+
+			// 卖方汇率
+			async 'data.currency'(newVal, oldVal){
+				if(!(this.status && oldVal))return
+				let date = this.data.signDate.slice(0, 10)
+				let currencyName = utils.getConfigFormOfSelect(this.configs,'currency',newVal);
+				let val = await utils.getExchangeRate(date,currencyName)
+				this.$set(this.data,'buyerExchangeRate',val)
+				if(!val){
+					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
+				}
+			},
+
+			// 买方汇率
+			async 'data.supplierCurrency'(newVal, oldVal){
+				if(this.status && (!oldVal))return
+				let date = this.data.signDate.slice(0, 10)
+				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',newVal);
+				let val = await utils.getExchangeRate(date,currencyName)
+				this.$set(this.data,'orderExchangeRate',val)
+				if(!val){
+					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
+				}
+			},
+
+			// 买方汇率
+			async 'data.supplierCurrency'(newVal, oldVal){
+				if(this.status && (!oldVal))return
+				let date = this.data.signDate.slice(0, 10)
+				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',newVal);
+				let val = await utils.getExchangeRate(date,currencyName)
+				this.$set(this.data,'orderExchangeRate',val)
+				if(!val){
+					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
+				}
 			},
 		},
 	};
