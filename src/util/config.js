@@ -162,11 +162,24 @@ export default {
   },
 
   /**
+   * @param {名称} 查询公式
+   */
+  async getCalculationFormula(solutionNo){
+    try {
+      const { list } = await api.getList('solutionformula',{billNo:solutionNo})
+      return list
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  /**
    * @param {名称} 登录
    */
   async loginUtil() {
     try {
-      return await await api.postVal('auth/login?userCode=admin&password=c33367701511b4f6020ec61ded352059');
+      // return await await api.postVal('auth/login?userCode=admin&password=c33367701511b4f6020ec61ded352059');
+      return await await api.postVal('auth/login?userCode=gq&password=e10adc3949ba59abbe56e057f20f883e');
     } catch (error) {
       return Promise.reject(error);
     }

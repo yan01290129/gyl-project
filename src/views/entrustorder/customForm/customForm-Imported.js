@@ -5,11 +5,7 @@ let rules = {
 };
 export default [
   {
-    none: false,
-    disab: false,
-    nonetitle: false,
-    title: "",
-    text: false,
+    nonetitle: true,
     items: [
       {
         name: "businessUnitName",
@@ -65,33 +61,33 @@ export default [
         selectapi: "receiveUnitType",
 				rules,
       },
-      // {
-      //   name: "receiveUnitName",
-      //   type: "inputbutton",
-      //   label: "收货单位",
-      //   readonly: true,
-			// 	rules,
-      // },
-      // {
-      //   name: "importPortName",
-      //   type: "select",
-      //   label: "进口口岸",
-      //   selectapi: "entryPort",
-      // },
-      // {
-      //   name: "sellerType",
-      //   type: "select",
-      //   label: "报关卖方类型",
-      //   selectapi: "receiveUnitType",
-			// 	rules,
-      // },
-      // {
-      //   name: "sellerName",
-      //   type: "inputbutton",
-      //   label: "报关合同卖方",
-      //   readonly: true,
-			// 	rules,
-      // },
+      {
+        name: "receiveUnitName",
+        type: "inputbutton",
+        label: "收货单位",
+        readonly: true,
+				rules,
+      },
+      {
+        name: "importPortName",
+        type: "select",
+        label: "进口口岸",
+        selectapi: "entryPort",
+      },
+      {
+        name: "sellerType",
+        type: "select",
+        label: "报关卖方类型",
+        selectapi: "receiveUnitType",
+				rules,
+      },
+      {
+        name: "sellerName",
+        type: "inputbutton",
+        label: "报关合同卖方",
+        readonly: true,
+				rules,
+      },
     ]
   }
 ];

@@ -8,39 +8,40 @@
     </data-form>
     <el-tabs v-model="activeName" v-if="tabIsDisabled">
       <el-tab-pane label="商品信息" name="goods">
-        <data-table v-loading='goods.loading' :data.sync="goods.data" :count.sync="goods.count" :configs.sync="goods.configs" :ruleData.sync="goods.ruleData" :noneRules='true' :operationConfigs='goods.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='goods.loading' :data.sync="goods.data" :count.sync="goods.count" :configs.sync="goods.configs" :ruleData.sync="goods.ruleData" :noneRules='true' :operationConfigs='goods.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperationGood'></data-table>
       </el-tab-pane>
       <el-tab-pane label="报关信息" name="custom" v-if="data.entrustOrderType == '1' || data.entrustOrderType == '2'">
         <data-form v-loading='custom.loading' :data.sync="custom.data" :configs="customConfigsFormfile" :operationConfigs='custom.optionConfigs' @handlerOperation='childFormOperation' @handlerPointSelection='childPointSelection'></data-form>
       </el-tab-pane>
       <el-tab-pane label="买方接货信息" name="buyer">
-        <data-table v-loading='buyer.loading' :data.sync="buyer.data" :count.sync="buyer.count" :configs.sync="buyer.configs" :ruleData.sync="buyer.ruleData" :noneRules='true' :operationConfigs='buyer.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='buyer.loading' :data.sync="buyer.data" :count.sync="buyer.count" :configs.sync="buyer.configs" :ruleData.sync="buyer.ruleData" :noneRules='true' :operationConfigs='buyer.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="卖方交货信息" name="seller">
-        <data-table v-loading='seller.loading' :data.sync="seller.data" :count.sync="seller.count" :configs.sync="seller.configs" :ruleData.sync="seller.ruleData" :noneRules='true' :operationConfigs='seller.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='seller.loading' :data.sync="seller.data" :count.sync="seller.count" :configs.sync="seller.configs" :ruleData.sync="seller.ruleData" :noneRules='true' :operationConfigs='seller.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="受托方收款" name="trusteereceipt">
-        <data-table v-loading='trusteereceipt.loading' :data.sync="trusteereceipt.data" :count.sync="trusteereceipt.count" :configs.sync="trusteereceipt.configs" :ruleData.sync="trusteereceipt.ruleData" :noneRules='true' :operationConfigs='trusteereceipt.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='trusteereceipt.loading' :data.sync="trusteereceipt.data" :count.sync="trusteereceipt.count" :configs.sync="trusteereceipt.configs" :ruleData.sync="trusteereceipt.ruleData" :noneRules='true' :operationConfigs='trusteereceipt.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="受托方付款" name="trusteepanyment">
-        <data-table v-loading='trusteepanyment.loading' :data.sync="trusteepanyment.data" :count.sync="trusteepanyment.count" :configs.sync="trusteepanyment.configs" :ruleData.sync="trusteepanyment.ruleData" :noneRules='true' :operationConfigs='trusteepanyment.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='trusteepanyment.loading' :data.sync="trusteepanyment.data" :count.sync="trusteepanyment.count" :configs.sync="trusteepanyment.configs" :ruleData.sync="trusteepanyment.ruleData" :noneRules='true' :operationConfigs='trusteepanyment.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperationTrusteepanyment'></data-table>
       </el-tab-pane>
       <el-tab-pane label="收货信息" name="receive">
-        <data-table v-loading='receive.loading' :data.sync="receive.data" :count.sync="receive.count" :configs.sync="receive.configs" :ruleData.sync="receive.ruleData" :noneRules='true' :operationConfigs='receive.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='receive.loading' :data.sync="receive.data" :count.sync="receive.count" :configs.sync="receive.configs" :ruleData.sync="receive.ruleData" :noneRules='true' :operationConfigs='receive.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="转款信息" name="transfer">
-        <data-table v-loading='transfer.loading' :data.sync="transfer.data" :count.sync="transfer.count" :configs.sync="transfer.configs" :ruleData.sync="transfer.ruleData" :noneRules='true' :operationConfigs='transfer.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='transfer.loading' :data.sync="transfer.data" :count.sync="transfer.count" :configs.sync="transfer.configs" :ruleData.sync="transfer.ruleData" :noneRules='true' :operationConfigs='transfer.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="付款信息" name="panyment">
-        <data-table v-loading='panyment.loading' :data.sync="panyment.data" :count.sync="panyment.count" :configs.sync="panyment.configs" :ruleData.sync="panyment.ruleData" :noneRules='true' :operationConfigs='panyment.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='panyment.loading' :data.sync="panyment.data" :count.sync="panyment.count" :configs.sync="panyment.configs" :ruleData.sync="panyment.ruleData" :noneRules='true' :operationConfigs='panyment.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
       <el-tab-pane label="收货与报关明细" name="detail">
-        <data-table v-loading='detail.loading' :data.sync="detail.data" :count.sync="detail.count" :configs.sync="detail.configs" :ruleData.sync="detail.ruleData" :noneRules='true' :operationConfigs='detail.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperation'></data-table>
+        <data-table v-loading='detail.loading' :data.sync="detail.data" :count.sync="detail.count" :configs.sync="detail.configs" :ruleData.sync="detail.ruleData" :noneRules='true' :operationConfigs='detail.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
     </el-tabs>
     <data-form v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
     <data-table-dialog v-loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
-    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperation' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
+    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood()' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
+    <data-form-dialog v-loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
   </div>
 </template>
 
@@ -76,6 +77,7 @@
 	import goodsImportedConfigsForm from "./goodsForm/goodsForm-Imported";
 	import goodsExitConfigsForm from "./goodsForm/goodsForm-Exit";
 	import goodsDomesticConfigsForm from "./goodsForm/goodsForm-Domestic";
+	import trusteepanymentConfigsForm from "./trusteepanymentForm";
 	
 	export default {
 		components: {
@@ -107,6 +109,8 @@
 				optionConfigs: [{ label: "保存", event: "save", type: "primary" }],
 				data:{},
 				configs:customConfigsForm,
+				configsImported:JSON.parse(JSON.stringify(customImportedConfigsForm)),
+				configsExit:JSON.parse(JSON.stringify(customExitConfigsForm)),
 			},
 			buyer:{
 				loading:false,
@@ -195,7 +199,18 @@
 				loading:false,
 				optionConfigs:childoptionDialog,
 				data:{},
-				configs:goodsConfigsForm,//
+				configs:goodsConfigsForm,
+				configsImported:JSON.parse(JSON.stringify(goodsImportedConfigsForm)),
+				configsExit:JSON.parse(JSON.stringify(goodsExitConfigsForm)),
+				configsDomestic:JSON.parse(JSON.stringify(goodsDomesticConfigsForm))
+			},
+			trusteepanymentformDialog:{
+				title:'受托方付款',
+				visible:false,
+				loading:false,
+				optionConfigs:childoptionDialog,
+				data:{},
+				configs:trusteepanymentConfigsForm
 			},
 			writeback:false // 回写
 		}),
@@ -237,31 +252,64 @@
 					}
 				}
 			},
-			// 商品表单
-			goodsConfigsFormfile(){
-				if(this.data.entrustOrderType == '1'){
-					return goodsImportedConfigsForm
+
+			// 卖方汇率  依赖条件
+			buyerExchangeRate(){
+				if(this.data.signDate && this.data.currency && (!this.writeback)){
+					let date = this.data.signDate.slice(0, 10)
+					let currencyName = utils.getConfigFormOfSelect(this.configs,'currency',this.data.currency);
+					return JSON.stringify({date,currencyName})
 				}
-				if(this.data.entrustOrderType == '2'){
-					return goodsExitConfigsForm
-				}
-				return goodsDomesticConfigsForm
 			},
+
+			// 买方汇率  依赖条件
+			orderExchangeRate(){
+				if(this.data.signDate && this.data.supplierCurrency && (!this.writeback)){
+					let date = this.data.signDate.slice(0, 10)
+					let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',this.data.supplierCurrency);
+					return JSON.stringify({date,currencyName})
+				}
+			},
+
+			// 协议公式  依赖条件
+			calculationFormula(){
+				if(this.data.solutionNo && (!this.writeback)){
+					return JSON.stringify({solutionNo:this.data.solutionNo})
+				}
+			},
+
+
+			// 报关表单
 			customConfigsFormfile(){
 				if(this.data.entrustOrderType == '1'){
 					if(this.status == '2'){
-						return utils.setConfigFormOfText(JSON.parse(JSON.stringify(customImportedConfigsForm)))
+						return utils.setConfigFormOfText(this.custom.configsImported)
 					}else{
-						return customImportedConfigsForm
+						return  this.custom.configsImported
 					}
 				}
 				if(this.data.entrustOrderType == '2'){
 					if(this.status == '2'){
-						return utils.setConfigFormOfText(JSON.parse(JSON.stringify(customExitConfigsForm)))
+						return utils.setConfigFormOfText(this.custom.configsExit)
 					}else{
-						return customExitConfigsForm
+						return this.custom.configsExit
 					}
 				}
+				return this.custom.configs
+			},
+			
+			// 商品弹窗表单
+			goodsConfigsFormfile(){
+				if(this.data.entrustOrderType == '1'){
+					return this.goodformDialog.configsImported
+				}
+				if(this.data.entrustOrderType == '2'){
+					return this.goodformDialog.configsExit
+				}
+				if(this.data.entrustOrderType == '3' || this.data.entrustOrderType == '4'){
+					return this.goodformDialog.configsDomestic
+				}
+				return this.goodformDialog.configs
 			},
 		},
 		methods: {
@@ -270,22 +318,16 @@
 				this.$router.go(-1);
 			},
 
-			// 获取表格下拉
-			async loadConfigSelect(activeName){
-				if(this.status == '2') return
-				if(activeName){
-					this[activeName].loading = true
-					this[activeName].configs = [...await utils.setConfigFormSelect(this[activeName].configs)]
-					this[activeName].loading = false
-				}else{
-					this.loading = true
-					this.configs = [...await utils.setConfigFormSelect(this.configs)]
-					this.configsOthor = [...await utils.setConfigFormSelect(this.configsOthor)]
-					this.loading = false
-				}
-			},
-
 			// *********************************主表*****************************
+
+			// 获取表单下拉
+			async loadConfigSelect(){
+				if(this.status == '2') return
+				this.loading = true
+				this.configs = [...await utils.setConfigFormSelect(this.configs)]
+				this.configsOthor = [...await utils.setConfigFormSelect(this.configsOthor)]
+				this.loading = false
+			},
 
 			// 操作按钮事件
 			operation(val){
@@ -354,8 +396,8 @@
 				this[this.activeName].currentRow = currentRow
 			},
 
-			// 操作按钮事件
-			async childOperation(val){
+			// 商品操作按钮事件
+			async childOperationGood(val){
 				if(val == 'add'){
 					this.goodformDialog.visible = true
 				}
@@ -365,10 +407,32 @@
 				}
 			},
 
+			// 商品操作按钮事件
+			async childOperationTrusteepanyment(val){
+				if(val == 'add'){
+					this.trusteepanymentformDialog.visible = true
+				}
+				if(val == 'upd'){
+				}
+				if(val == 'del'){
+				}
+			},
+
 			// *********************************子表表单（报关信息）*****************************
 
+			// 获取下拉
+			async childloadConfigSelect(activeName){
+				if(this.status == '2') return
+				this[activeName].loading = true
+				if(activeName == 'custom'){
+					this.custom.configsImported = [...await utils.setConfigFormSelect(this.custom.configsImported)]
+					this.custom.configsExit = [...await utils.setConfigFormSelect(this.custom.configsExit)]
+				}
+				this[activeName].loading = false
+			},
+
 			// 回写表单
-			async childloadConfigSelect(){
+			async childGetFormList(){
 				try {
 					this.custom.loading = true
 					this.custom.data = {...this.custom.data,...await api.getVal('entrustcustom/'+this.data.entrustOrderNo)};
@@ -391,10 +455,34 @@
 
 			// *********************************弹窗表单*****************************
 
-			// 操作按钮事件
-			async fromDialogOperation(val){
+			// 下拉
+			async DialogloadConfigSelect(activeName){
+				if(this.status == '2') return
+				this[activeName].loading = true
+				if(activeName == 'goodformDialog'){
+					this.goodformDialog.configsImported = [...await utils.setConfigFormSelect(this.goodformDialog.configsImported)]
+					this.goodformDialog.configsExit = [...await utils.setConfigFormSelect(this.goodformDialog.configsExit)]
+					this.goodformDialog.configsDomestic = [...await utils.setConfigFormSelect(this.goodformDialog.configsDomestic)]
+				}
+				if(activeName == 'trusteepanymentformDialog'){
+					this.trusteepanymentformDialog.configs = [...await utils.setConfigFormSelect(this.trusteepanymentformDialog.configs)]
+				}
+				this[activeName].loading = false
+			},
+
+			// 商品操作按钮事件
+			async fromDialogOperationGood(val){
 				if(val == 'cancel'){
 					this.goodformDialog.visible = false
+				}
+				if(val == 'confirm'){
+				}
+			},
+
+			// 受托方付款操作按钮事件
+			async fromDialogOperationTrusteepanyment(val){
+				if(val == 'cancel'){
+					this.trusteepanymentformDialog.visible = false
 				}
 				if(val == 'confirm'){
 				}
@@ -431,10 +519,11 @@
 				}
 			}
 		},
-		created(){
+		async created(){
 			// 初始化配置
+			this.writeback = true
 			this.data = utils.inntForm(this.data,this.configs)
-			this.loadConfigSelect()
+			await this.loadConfigSelect()
 			// ------状态对应回写
 			// 修改
 			this.data = {...this.$route.params}
@@ -449,9 +538,18 @@
 				
 			}
 			// 提交
-			this.status == '2' && (this.configs = [...utils.setConfigFormOfText(this.configs)], this.optionConfigs = [],this.configsOthor = [...utils.setConfigFormOfText(this.configsOthor)],this.custom.optionConfigs = [])
-		},
-		mounted(){
+			if(this.status == '2'){
+				this.configs = [...utils.setConfigFormOfText(this.configs)]
+				this.configsOthor = [...utils.setConfigFormOfText(this.configsOthor)]
+				this.optionConfigs = [],this.custom.optionConfigs = []
+				this.custom.configsImported = [...utils.setConfigFormOfText(this.custom.configsImported)]
+				this.custom.configsExit = [...utils.setConfigFormOfText(this.custom.configsExit)]
+				this.goodformDialog.configsImported = [...utils.setConfigFormOfText(this.goodformDialog.configsImported)]
+				this.goodformDialog.configsExit = [...utils.setConfigFormOfText(this.goodformDialog.configsExit)]
+				this.goodformDialog.configsDomestic = [...utils.setConfigFormOfText(this.goodformDialog.configsDomestic)]
+				this.trusteepanymentformDialog.configs = [...utils.setConfigFormOfText(this.trusteepanymentformDialog.configs)]
+			}
+			this.writeback = false
 		},
 		watch:{
 			tabIsDisabled(newVal, oldVal){
@@ -471,14 +569,14 @@
 					this.status == '2' && (this.goods.optionConfigs = [],this.trusteepanyment.optionConfigs = [])
 					// 初始化表单
 					this.custom.data = utils.inntForm(this.custom.data,this.custom.configs)
-					this.loadConfigSelect('custom')
+					this.childloadConfigSelect('custom')
 					// 回写表单
-					this.childloadConfigSelect()
+					this.childGetFormList()
 					// 表单限制操作
 					this.status == '2' && (this.custom.configs = [...utils.setConfigFormOfText(this.custom.configs)], this.custom.optionConfigs = [])
 					// 初始化弹窗表单
 					this.goodformDialog.data = utils.inntForm(this.goodformDialog.data,this.goodformDialog.configs)
-					this.loadConfigSelect('goodformDialog')
+					this.DialogloadConfigSelect('goodformDialog')
 
 				}
 			},
@@ -583,11 +681,9 @@
 			},
 
 			// 卖方汇率
-			async 'data.currency'(newVal, oldVal){
-				if(!(this.status && oldVal))return
-				let date = this.data.signDate.slice(0, 10)
-				let currencyName = utils.getConfigFormOfSelect(this.configs,'currency',newVal);
-				let val = await utils.getExchangeRate(date,currencyName)
+			async buyerExchangeRate(newVal, oldVal){
+				let obj = JSON.parse(newVal)
+				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
 				this.$set(this.data,'buyerExchangeRate',val)
 				if(!val){
 					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
@@ -595,28 +691,22 @@
 			},
 
 			// 买方汇率
-			async 'data.supplierCurrency'(newVal, oldVal){
-				if(this.status && (!oldVal))return
-				let date = this.data.signDate.slice(0, 10)
-				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',newVal);
-				let val = await utils.getExchangeRate(date,currencyName)
+			async orderExchangeRate(newVal, oldVal){
+				let obj = JSON.parse(newVal)
+				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
 				this.$set(this.data,'orderExchangeRate',val)
 				if(!val){
 					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
 				}
 			},
 
-			// 买方汇率
-			async 'data.supplierCurrency'(newVal, oldVal){
-				if(this.status && (!oldVal))return
-				let date = this.data.signDate.slice(0, 10)
-				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',newVal);
-				let val = await utils.getExchangeRate(date,currencyName)
-				this.$set(this.data,'orderExchangeRate',val)
-				if(!val){
-					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
-				}
+			// 公式
+			async calculationFormula(newVal, oldVal){
+				let obj = JSON.parse(newVal)
+				let val = await utils.getCalculationFormula(obj.solutionNo)
+				console.log(val)
 			},
+			
 		},
 	};
 </script>

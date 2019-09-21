@@ -64,7 +64,7 @@
                     <label class="colon">:</label>
                     <i v-if='item.type == "input" || item.type == "num" || item.type == "inputbutton" || item.type == "textarea"'>{{data[item.name] || '*'}}</i>
                     <i v-if='item.type == "date"'><i class="el-icon-time"></i>{{data[item.name] || '*'}}</i>
-                    <i v-if='item.type == "select" || item.type == "radio"'>{{item['options'][data[item.name]]?item['options'][data[item.name]]["label"]:'*'}}</i>
+                    <i v-if='item.type == "select" || item.type == "radio"'>{{(data[item.name] && item['options'][data[item.name]])?item['options'][data[item.name]]["label"]:'*'}}</i>
                     <i v-if='item.type == "switch"'>{{data[item.name]===true?'是':data[item.name]===false?'否':'*'}}</i>
                     <i v-if='item.type == "checkbox"'>
                       <template v-if="item['options'].length>0">

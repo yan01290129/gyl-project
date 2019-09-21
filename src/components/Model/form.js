@@ -68,26 +68,41 @@ export default [
       {
         name: "num",
         type: "num",
-        label: "数字框"
+        label: "数字框",
+        decimal:4,
+        disabled: true,
       },
       {
         type: "numselect",
         label: "下拉数字框",
         name: "numselect",
+        decimal:4,
+        disabled: true,
         selsect: "numselectSelect",
-        selectapi: "entrustOrderTypeG"
+        selectapi: "entrustOrderTypeG",
+        selsectDisabled:true,
+        long: true
       },
       {
         name: "money",
         type: "money",
-        label: "金额框"
+        label: "金额框",
+        decimal:2,
+        symbol:'￥',
+        disabled: true,
       },
       {
         selsect: "moneyselectSelect",
         type: "moneyselect",
         label: "下拉金额框",
         name: "moneyselect",
-        selectapi: "entrustOrderTypeG"
+        decimal:2,
+        symbol:'￥',
+        disabled: true,
+        selsect:'customTotalAmountcurrency',
+        selectapi: "entrustOrderTypeG",
+        selsectDisabled:true,
+        long: true
       },
       {
         name: "percent",
