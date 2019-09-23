@@ -4,7 +4,7 @@ import { getToken, setToken, removeToken } from "./session";
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: "/scp",
+  baseURL: "/apis",
   timeout: 5000
 });
 

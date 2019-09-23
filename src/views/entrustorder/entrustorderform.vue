@@ -225,6 +225,7 @@
 				configs:trusteepanymentConfigsForm
 			},
 			writeback:false, // 回写
+			childwriteback:false, // 回写
 			standardcurrency: '3', // 本位币
 			formulalist:'', //  公式
 			
@@ -315,15 +316,53 @@
 			// 商品弹窗表单
 			goodsConfigsFormfile(){
 				if(this.data.entrustOrderType == '1'){
-					return this.goodformDialog.configsImported
+					var configs = this.goodformDialog.configsImported
+					if(this.data.dealMode == "2"){//CIF && 进口
+						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'extrasRate',{disabled:true})
+					}
+					if(this.data.dealMode == "3"){//C&F && 进口
+						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
+					}
+					if(this.data.dealMode == "4"){//C&I && 进口
+						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+					}
+					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})//退税率%
+					return configs
 				}
 				if(this.data.entrustOrderType == '2'){
-					return this.goodformDialog.configsExit
+					var configs = this.goodformDialog.configsExit
+					if(this.data.dealMode == "1"){//FOB && 出口
+						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'extrasRate',{disabled:true})
+					}
+					if(this.data.dealMode == "3"){//C&F && 进口
+						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+					}
+					if(this.data.dealMode == "4"){//C&I && 进口
+						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+						configs = utils.setConfigForm(configs,'extrasRate',{disabled:true})
+					}
+					return configs
 				}
-				if(this.data.entrustOrderType == '3' || this.data.entrustOrderType == '4'){
-					return this.goodformDialog.configsDomestic
+				if(this.data.entrustOrderType == '3'){
+					var configs = this.goodformDialog.configsDomestic
+					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})
+					return configs
 				}
-				return this.goodformDialog.configs
+				if(this.data.entrustOrderType == '4'){
+					var configs = this.goodformDialog.configsDomestic
+					//C&I && 出口
+					configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
+					configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
+					configs = utils.setConfigForm(configs,'extrasRate',{disabled:true})
+					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})
+					return configs
+				}
+				return configs
 			},
 		},
 		methods: {
@@ -414,11 +453,22 @@
 			// 商品操作按钮事件
 			async childOperationGood(val){
 				if(val == 'add'){
+					this.childwriteback= true
 					this.goodformDialog.data = {}
 					//海关汇率
-					this.gethgtimeExchangerate()
+					await this.gethgtimeExchangerate()
 					// 货款汇率 = 订单汇率 / 买方汇率
 					this.$set(this.goodformDialog.data,'buyerExchangeRate',parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6)))
+					this.childwriteback= true
+					this.goodformDialog.visible = true
+				}
+				if(val == 'upd'){
+					if(!this.goods.currentRow){
+						return this.$message({ message: '请选择记录', type: 'warning',center: true });
+					}
+					this.childwriteback= true
+					this.goodformDialog.data = this.goods.currentRow
+					this.childwriteback= true
 					this.goodformDialog.visible = true
 				}
 				if(val == 'del'){
@@ -443,15 +493,11 @@
 					this.trusteepanymentformDialog.visible = true
 				}
 				if(val == 'upd'){
-					if(val == 'upd'){
-						if(!this.trusteepanymentformDialog.currentRow){
-							return this.$message({ message: '请选择记录', type: 'warning',center: true });
-						}
-						this.trusteepanymentformDialog.data = this.trusteepanyment.currentRow
-						this.trusteepanymentformDialog.visible = true
+					if(!this.trusteepanyment.currentRow){
+						return this.$message({ message: '请选择记录', type: 'warning',center: true });
 					}
-					if(val == 'del'){
-					}
+					this.trusteepanymentformDialog.data = this.trusteepanyment.currentRow
+					this.trusteepanymentformDialog.visible = true
 				}
 				if(val == 'del'){
 				}
@@ -933,16 +979,23 @@
 				console.log('重新计算')
 			},
 
+			'goodformDialog.data'(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
+				// 重新计算
+				console.log('重新计算')
+			},
+
 			async 'goodformDialog.data.arrivalGoodsModel'(newVal, oldVal){
+				if(this.childwriteback) return
 				// 来货规格型号
 				if (newVal) {
 					// 录入
 					try {
 						debugger
-						const { data } = await api.getList("materielbase", {specificationType: newVal});
-						if (data.list.length > 0) {
+						const { list } = await api.getList("materielbase", {specificationType: newVal});
+						if (list.length > 0) {
 							// 录入
-							let rowData = data.list[0]
+							let rowData = list[0]
 							this.goodformDialog.data["orderModel"] = rowData["materielCode"]; //来货编码
 							this.goodformDialog.data["arrivalGoodsName"] = rowData["tradeName"]; //来货名称
 							this.goodformDialog.data["goodsCode"] = rowData["materielCode"]; //商品编码
@@ -964,20 +1017,20 @@
 					}
 				}
 				// 清除
-					this.goodformDialog.data["orderModel"] = ""; //来货编码
-					this.goodformDialog.data["arrivalGoodsName"] = ""; //来货名称
-					this.goodformDialog.data["goodsCode"] = ""; //商品编码
-					this.goodformDialog.data["goodsName"] = ""; //商品名称
-					this.goodformDialog.data["sellerUnit"] = ""; //成交单位编码
-					this.goodformDialog.data["sellerUnitName"] = ""; //成交单位
-					this.goodformDialog.data["arrivalGoodsCode"] = "";
-					this.goodformDialog.data["taxNo"] = ""; // 税号
-					this.goodformDialog.data["attachNo"] = ""; // 附号
-					this.goodformDialog.data["customTaxRate"] = ""; // 关税税率
-					this.goodformDialog.data["increaseTaxRate"] = ""; // 关税加征
-					this.goodformDialog.data["superviseMode"] = '' // 监管条件
-					this.goodformDialog.data["superviseModeName"] = '' //监管条件
-					this.goodformDialog.data["vatTaxRate"] = '' //进口增值税率
+				this.goodformDialog.data["orderModel"] = ""; //来货编码
+				this.goodformDialog.data["arrivalGoodsName"] = ""; //来货名称
+				this.goodformDialog.data["goodsCode"] = ""; //商品编码
+				this.goodformDialog.data["goodsName"] = ""; //商品名称
+				this.goodformDialog.data["sellerUnit"] = ""; //成交单位编码
+				this.goodformDialog.data["sellerUnitName"] = ""; //成交单位
+				this.goodformDialog.data["arrivalGoodsCode"] = "";
+				this.goodformDialog.data["taxNo"] = ""; // 税号
+				this.goodformDialog.data["attachNo"] = ""; // 附号
+				this.goodformDialog.data["customTaxRate"] = ""; // 关税税率
+				this.goodformDialog.data["increaseTaxRate"] = ""; // 关税加征
+				this.goodformDialog.data["superviseMode"] = '' // 监管条件
+				this.goodformDialog.data["superviseModeName"] = '' //监管条件
+				this.goodformDialog.data["vatTaxRate"] = '' //进口增值税率
 			},
 
 			// ********************统计操纵
