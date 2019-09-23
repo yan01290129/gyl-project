@@ -1,6 +1,6 @@
 import api from "@/api";
 import utils from "@/util/config";
-
+// 主表
 import companyinfo from "../companyinfo/table";
 import companyinfoRuleConfigs from "../companyinfo/rule";
 import department from "../department/table";
@@ -19,6 +19,9 @@ import agreement from "../agreement/table";
 import agreementRuleConfigs from "../agreement/rule";
 import agreementsolution from "../agreementsolution/table";
 import agreementsolutionRuleConfigs from "../agreementsolution/rule";
+// 商品
+import materielbase from "../materielbase/table";
+import materielbaseRuleConfigs from "../materielbase/rule";
 
 const TABLE_lIMIT = {
   clientContactName: {
@@ -109,6 +112,18 @@ const TABLE_CONFIGS = {
     ruleConfigs: agreementsolutionRuleConfigs,
     configs: agreementsolution
   },
+  arrivalGoodsModel:{
+    title: "物料基础信息列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: materielbaseRuleConfigs,
+    configs: materielbase
+  },
+  orderModel:{
+    title: "物料基础信息列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: materielbaseRuleConfigs,
+    configs: materielbase
+  },
   
 };
 
@@ -187,7 +202,13 @@ const TABLE_WRITE = {
     invoiceType: "invoiceType",//发票类型
     matPayment: "matPayment",//是否垫货款
     minCharge: "minimumCharge",//低消金额
-  }
+  },
+  arrivalGoodsModel:{
+    arrivalGoodsModel: "specificationType",//来货规格型号
+  },
+  orderModel:{
+    arrivalGoodsModel: "specificationType",//来货规格型号
+  },
 };
 
 export default {

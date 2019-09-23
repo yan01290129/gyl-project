@@ -41,7 +41,7 @@
 		},
 		methods: {
 			inputChange(data, item) {
-			this.$emit("handlerPointSelection", data, item);
+				this.$emit("handlerInputChange", data, item);
 			},
 			pointSelection(data, item) {
 			this.$emit("handlerPointSelection", data, item);

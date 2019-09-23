@@ -9,14 +9,15 @@ export default [
     items: [
       {
         name: "orderModel",
-        type: "input",
+        type: "inputbutton",
         label: "来货编码",
+        // readonly: true,
       },
       {
         name: "arrivalGoodsModel",
         type: "inputbutton",
         label: "来货规格型号",
-        readonly: true,
+        // readonly: true,
         rules
       },
       {
@@ -193,7 +194,7 @@ export default [
       },
       {
         name: "customsExchangeRate",
-        label: "订单汇率",
+        label: "海关汇率",
         type: "num",
         decimal:6,
         disabled: true

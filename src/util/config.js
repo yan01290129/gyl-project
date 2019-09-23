@@ -162,6 +162,26 @@ export default {
   },
 
   /**
+   * @param {名称} 查询海关汇率
+   */
+  async getCustomsExchangerate(data,currency){
+    try {
+      const list = await api.getCustomsExchangerate(data)
+      for (let i = 0; i < list.length; i++) {
+        var exchangerate = ''
+        list.forEach(b => {
+          if (currency == b.currency) {
+            exchangerate = b.cenPrice;
+          }
+        });
+        return parseFloat(exchangerate);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  /**
    * @param {名称} 查询公式
    */
   async getCalculationFormula(solutionNo){

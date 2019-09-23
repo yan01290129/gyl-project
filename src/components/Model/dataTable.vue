@@ -54,7 +54,7 @@
 			},
 			ruleData: {
 				type: Object,
-				default: {},
+				default: () => {},
 				desc: "搜索值"
 			},
 			ruleConfigs: {

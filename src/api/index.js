@@ -60,6 +60,14 @@ export default {
     });
   },
 
+  // 指定日期海关汇率
+  getCustomsExchangerate(date) {
+    return request({
+      url: `exchangerate/custom/${date}`,
+      method: "GET"
+    });
+  },
+
   // 委托订单-新增
   addEntrustorderData(data) {
     return request({

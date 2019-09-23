@@ -38,10 +38,14 @@
         <data-table v-loading='detail.loading' :data.sync="detail.data" :count.sync="detail.count" :configs.sync="detail.configs" :ruleData.sync="detail.ruleData" :noneRules='true' :operationConfigs='detail.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
       </el-tab-pane>
     </el-tabs>
+    <!--统计--->
+    <el-divider v-if="tabIsDisabled" content-position="left">统计</el-divider>
+    <data-table v-if="tabIsDisabled" v-loading='goodsAll.statisticsloading' :data.sync="goodsAll.statisticsData" :count="1" :ruleData={} :configs.sync="goodsAll.statisticsConfigs"></data-table>
     <data-form v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
+    <!--弹窗--->
     <data-table-dialog v-loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
-    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood()' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
-    <data-form-dialog v-loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelection'></data-form-dialog>
+    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood' @handlerPointSelection='fromDialogPointSelectionGoods'></data-form-dialog>
+    <data-form-dialog v-loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelectionTrusteepanyment'></data-form-dialog>
   </div>
 </template>
 
@@ -57,6 +61,7 @@
 	import DataTable from "@/components/Model/dataTable.vue";
 	import childoptionConfigs from "./optable";
 	import goodsConfigsTable from "./goodsTable";
+	import statisticsConfigsTable from "./statisticsTable";
 	import buyerConfigs from "./buyerTable";
 	import sellerConfigs from "./sellerTable";
 	import trusteereceiptConfigs from "./trusteereceiptTable";
@@ -193,6 +198,13 @@
 				count:0,
 				configs:{},
 			},
+			goodsAll:{
+				data:[],
+				// 展示数据
+				statisticsloading:false,
+				statisticsData:[],
+				statisticsConfigs:statisticsConfigsTable,
+			},
 			goodformDialog:{
 				title:'委托订单',
 				visible:false,
@@ -212,7 +224,10 @@
 				data:{},
 				configs:trusteepanymentConfigsForm
 			},
-			writeback:false // 回写
+			writeback:false, // 回写
+			standardcurrency: '3', // 本位币
+			formulalist:'', //  公式
+			
 		}),
   		computed: {
 			// 状态
@@ -277,7 +292,6 @@
 					return JSON.stringify({solutionNo:this.data.solutionNo})
 				}
 			},
-
 
 			// 报关表单
 			customConfigsFormfile(){
@@ -362,6 +376,7 @@
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
 				this.tableDialog.item = item
+				this.tableDialog.itemform = ''
 				this.tableDialog.visible = true
     			this.tableDialog.loading = true
 				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
@@ -399,20 +414,44 @@
 			// 商品操作按钮事件
 			async childOperationGood(val){
 				if(val == 'add'){
+					this.goodformDialog.data = {}
+					//海关汇率
+					this.gethgtimeExchangerate()
+					// 货款汇率 = 订单汇率 / 买方汇率
+					this.$set(this.goodformDialog.data,'buyerExchangeRate',parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6)))
 					this.goodformDialog.visible = true
-				}
-				if(val == 'upd'){
 				}
 				if(val == 'del'){
 				}
 			},
 
-			// 商品操作按钮事件
+			
+			// 查询当月海关汇率
+			async gethgtimeExchangerate () {
+				let date = this.data.signDate.slice(0, 7)
+				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',this.data.supplierCurrency);
+				let val = await utils.getCustomsExchangerate(date,currencyName)
+				this.$set(this.goodformDialog.data,'customsExchangeRate',val)
+				if(!val){
+					this.$message({ message: '获取海关汇率失效', type: 'warning',center: true });	
+				}
+			},
+
+			// 受托方付款操作按钮事件
 			async childOperationTrusteepanyment(val){
 				if(val == 'add'){
 					this.trusteepanymentformDialog.visible = true
 				}
 				if(val == 'upd'){
+					if(val == 'upd'){
+						if(!this.trusteepanymentformDialog.currentRow){
+							return this.$message({ message: '请选择记录', type: 'warning',center: true });
+						}
+						this.trusteepanymentformDialog.data = this.trusteepanyment.currentRow
+						this.trusteepanymentformDialog.visible = true
+					}
+					if(val == 'del'){
+					}
 				}
 				if(val == 'del'){
 				}
@@ -451,7 +490,20 @@
 			},
 
 			// 点选
-			childPointSelection(){},
+			async childPointSelection(){
+				var limit = dialogDataUtil.limitSelectionTable(data, item)
+				if(limit){
+					return this.$message({ message: limit, type: 'warning',center: true });
+				}
+				this.tableDialog.item = item
+				this.tableDialog.itemform = 'custom'
+				this.tableDialog.visible = true
+    			this.tableDialog.loading = true
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
+				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
+    			this.tableDialog.loading = false
+
+			},
 
 			// *********************************弹窗表单*****************************
 
@@ -489,7 +541,34 @@
 			},
 			
 			// 点选
-			fromDialogPointSelection(){},
+			async fromDialogPointSelectionGoods(data, item){
+				var limit = dialogDataUtil.limitSelectionTable(data, item)
+				if(limit){
+					return this.$message({ message: limit, type: 'warning',center: true });
+				}
+				this.tableDialog.item = item
+				this.tableDialog.itemform = 'goodformDialog'
+				this.tableDialog.visible = true
+    			this.tableDialog.loading = true
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
+				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
+    			this.tableDialog.loading = false
+			},
+			
+			// 点选
+			async fromDialogPointSelectionTrusteepanyment(data, item){
+				var limit = dialogDataUtil.limitSelectionTable(data, item)
+				if(limit){
+					return this.$message({ message: limit, type: 'warning',center: true });
+				}
+				this.tableDialog.item = item
+				this.tableDialog.itemform = 'trusteepanymentformDialog'
+				this.tableDialog.visible = true
+    			this.tableDialog.loading = true
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
+				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
+    			this.tableDialog.loading = false
+			},
 
 			// *********************************弹窗表格*****************************
 
@@ -511,13 +590,125 @@
 						return this.$message({ message: '请选择数据', type: 'warning',center: true });
 					}
 					const writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow)
-					this.data = {...this.data,...writeVla}
+					if(this.tableDialog.itemform){
+						for (let key in writeVla) {
+							this.$set(this[this.tableDialog.itemform].data, key, writeVla[key])
+						}
+						// this[this.tableDialog.itemform].data = {...this[this.tableDialog.itemform].data,...writeVla}
+					}else{
+						this.data = {...this.data,...writeVla}
+					}
 					this.tableDialog.visible = false
 				}
 				if(val == 'cancel'){
 					this.tableDialog.visible = false
 				}
+			},
+
+			// 统计
+			async childGetTableGoodAll() {
+				try {
+					// 获取所有商品
+					this.goodsAll.statisticsloading = true
+					const { list } = await utils.getConfigTable(this['goods'].configs.api, {entrustOrderNo:this.data.entrustOrderNo})
+					this.goodsAll.data = list
+					// 计算统计数据
+					let data = {
+						goodsValue: 0, /* 卖方销售货价 */
+						costAmountCount: 0, /* 运保杂费额 */
+						customTotalAmount: 0,/* 关税税额 */
+						exciseTaxCount: 0, /* 消费税额 */
+						vatTotalAmount: 0,/* 进口环节增值税税额 */
+						otherTaxAmountCount: 0,/* 其他税金 */
+						priceTaxCount: 0, /* 价税合计 */
+						totalServiceCharge: 0,/* 服务费 */
+						netWeightCount: 0,/* 净重 */
+						grossWeightCount: 0,/*  毛重 */
+						trusteePayGoodsAmount: 0,/* 受托方应付货款总额 */
+					}
+					const statisticsTable = {
+						goodsValue: 'sellerGoodsValue',
+						costAmountCount: 'costAmount',
+						customTotalAmount: 'customTaxAmount',
+						exciseTaxCount: 'exciseTax',
+						vatTotalAmount: 'vatTaxAmount',
+						otherTaxAmountCount: 'otherTaxAmount',
+						priceTaxCount: 'priceTax',
+						totalServiceCharge: 'serviceFee',
+						netWeightCount: 'netWeight',
+						grossWeightCount: 'grossWeight',
+						trusteePayGoodsAmount: 'sellerGoodsValue'
+					}
+					for (let item of this.goodsAll.data) {
+						for (let key in statisticsTable) {
+							if (item.hasOwnProperty(statisticsTable[key])) {
+								data[key] = parseFloat(parseFloat(item[statisticsTable[key]] + data[key]).toFixed(6))
+							}
+						}
+					}
+					// 填充统计表格
+					this.$set(this.goodsAll, 'statisticsData', [this.data])
+					// 填充统计表单
+					for (let key in data) {
+						this.$set(this.data, key, data[key])
+					}
+					// 默认本位币
+					this.$set(this.data, 'customTotalAmountcurrency', this.standardcurrency)
+					this.$set(this.data, 'vatTotalAmountcurrency', this.standardcurrency)
+					this.$set(this.data, 'totalServiceChargecurrency', this.standardcurrency)
+					this.$set(this.data, 'invoiceAmountcurrency', this.standardcurrency)
+					this.$set(this.data, 'advanceActualAmountcurrency', this.standardcurrency)
+					// 低消差额 最低消费额 - 服务费总和
+					this.$set(this.data, 'minimumCharge', this.data.minCharge - this.data.totalServiceCharge)
+					this.statisticsOther()
+				} catch (error) {
+					this.$message({ message: '获取数据失败', type: 'warning',center: true });
+					return Promise.reject(error)
+				} finally {
+					this.goodsAll.statisticsloading = false
+				}
+			},
+
+			// 其他统计
+			statisticsOther(){
+					// 低消处理后的服务费
+					if (this.data.minimumCharge > 0) { 
+						var totalServiceCharge = this.data.minCharge;
+					} else {
+						var totalServiceCharge = this.data.totalServiceCharge;
+					}
+	  
+					//  应开票金额
+					// 	进出口 单：价税合计+服务费(底消处理后)+杂费（代理报检费和检疫费）
+					// 	进出口 双：服务费+杂费
+					// 	本港 :  货值（转人命币）+服务费+杂费
+					var invoiceAmount = 0
+					if (this.rise == "single") {
+						invoiceAmount = this.data.priceTaxCount + totalServiceCharge + this.data.agencyFee + this.data.quarantineFee
+					} else if (this.rise == "double") {
+						invoiceAmount = totalServiceCharge + this.data.agencyFee + this.data.quarantineFee
+					} else if (this.rise == "other" || this.data.entrustOrderType == 3) {
+						invoiceAmount = totalServiceCharge + this.data.agencyFee + this.data.quarantineFee + (this.data.goodsValue / this.data.buyerExchangeRate)
+					}
+					this.$set(this.data, 'invoiceAmount', invoiceAmount)
+					
+					// 预计应收总额
+					// 	进出口 单双：价税合计+服务费+杂费(勾选是否垫货款)   or 价税合计 - 货值（转人命币）+服务费+杂费(不勾选是否垫货款)
+					// 	本港 :  货值（转人命币）+服务费+杂费
+					var advanceAmount = 0
+					if (this.data.entrustOrderType == 1 || this.data.entrustOrderType == 2) {
+						if(this.data.matPayment){
+							advanceAmount = this.data.priceTaxCount + totalServiceCharge + this.data.agencyFee + this.data.quarantineFee
+						}else{
+							advanceAmount = this.data.priceTaxCount + totalServiceCharge + this.data.agencyFee + this.data.quarantineFee - (this.data.goodsValue / this.data.buyerExchangeRate)
+						}
+					} else if (this.data.entrustOrderType == 3) {
+						advanceAmount = totalServiceCharge + this.data.agencyFee + this.data.quarantineFee + (this.data.goodsValue / this.data.buyerExchangeRate)
+					}
+					this.$set(this.data, 'advanceAmount', advanceAmount)
 			}
+			
+			
 		},
 		async created(){
 			// 初始化配置
@@ -565,6 +756,8 @@
 					this.transfer.ruleData = utils.inntTable({entrustOrderNo:this.data.entrustOrderNo})
 					this.panyment.ruleData = utils.inntTable({entrustOrderNo:this.data.entrustOrderNo})
 					this.detail.ruleData = utils.inntTable({entrustOrderNo:this.data.entrustOrderNo})
+					// 获取统计数据
+					this.childGetTableGoodAll()
 					// 表格限制操作
 					this.status == '2' && (this.goods.optionConfigs = [],this.trusteepanyment.optionConfigs = [])
 					// 初始化表单
@@ -577,7 +770,6 @@
 					// 初始化弹窗表单
 					this.goodformDialog.data = utils.inntForm(this.goodformDialog.data,this.goodformDialog.configs)
 					this.DialogloadConfigSelect('goodformDialog')
-
 				}
 			},
 			'goods.ruleData': {
@@ -680,8 +872,11 @@
 				deep: true
 			},
 
-			// 卖方汇率
+			// **************商品操作
+
+			// 卖方汇率依赖
 			async buyerExchangeRate(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
 				let obj = JSON.parse(newVal)
 				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
 				this.$set(this.data,'buyerExchangeRate',val)
@@ -690,8 +885,9 @@
 				}
 			},
 
-			// 买方汇率
+			// 买方汇率依赖
 			async orderExchangeRate(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
 				let obj = JSON.parse(newVal)
 				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
 				this.$set(this.data,'orderExchangeRate',val)
@@ -700,11 +896,100 @@
 				}
 			},
 
-			// 公式
+			// 公式依赖
 			async calculationFormula(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
 				let obj = JSON.parse(newVal)
-				let val = await utils.getCalculationFormula(obj.solutionNo)
-				console.log(val)
+				this.formulalist = await utils.getCalculationFormula(obj.solutionNo)
+				let defaultlist = [
+					{formula:'sellerGoodsValue=sellerQuantity*sellerPrice'},
+					{formula:'priceTax=sellerGoodsValue*data_orderExchangeRate+customTaxAmount+exciseTax+vatTaxAmount+otherTaxAmount'},
+					{formula:'buyerPrice=buyerGoodsValue/sellerQuantity'},
+					{formula:'buyerGoodsValue=(priceTax+serviceFee)/buyerRate'},
+				]
+				for (let item of defaultlist) {
+					this.formulalist.push(item)
+				}
+			},
+
+			// 卖方汇率
+			'data.buyerExchangeRate'(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
+				// 重新计算
+				console.log('重新计算')
+			},
+
+			// 买方汇率
+			'data.orderExchangeRate'(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
+				// 重新计算
+				console.log('重新计算')
+			},
+
+			// 公式
+			formulalist(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
+				// 重新计算
+				console.log('重新计算')
+			},
+
+			async 'goodformDialog.data.arrivalGoodsModel'(newVal, oldVal){
+				// 来货规格型号
+				if (newVal) {
+					// 录入
+					try {
+						debugger
+						const { data } = await api.getList("materielbase", {specificationType: newVal});
+						if (data.list.length > 0) {
+							// 录入
+							let rowData = data.list[0]
+							this.goodformDialog.data["orderModel"] = rowData["materielCode"]; //来货编码
+							this.goodformDialog.data["arrivalGoodsName"] = rowData["tradeName"]; //来货名称
+							this.goodformDialog.data["goodsCode"] = rowData["materielCode"]; //商品编码
+							this.goodformDialog.data["goodsName"] = rowData["customsAbbreviation"]; //商品名称
+							this.goodformDialog.data["sellerUnit"] = rowData["measurementUnit"]; //成交单位编码
+							this.goodformDialog.data["sellerUnitName"] = rowData["measurementUnitName"]; //成交单位
+							this.goodformDialog.data["arrivalGoodsCode"] = rowData["materielCode"];
+							this.goodformDialog.data["taxNo"] = rowData["taxNo"]; // 税号
+							this.goodformDialog.data["attachNo"] = rowData["attachNo"]; // 附号
+							this.goodformDialog.data["customTaxRate"] = rowData["customsRate"]; // 关税税率
+							this.goodformDialog.data["increaseTaxRate"] = rowData["levyRate"]// 关税加征
+							this.goodformDialog.data["superviseMode"] = rowData["superCondition"] // 监管条件
+							this.goodformDialog.data["superviseModeName"] = rowData["superConditionName"] //监管条件
+							this.goodformDialog.data["vatTaxRate"] = rowData["valueAddRate"] //进口增值税率
+							return
+						}
+					} catch (e) {
+						console.log(e);
+					}
+				}
+				// 清除
+					this.goodformDialog.data["orderModel"] = ""; //来货编码
+					this.goodformDialog.data["arrivalGoodsName"] = ""; //来货名称
+					this.goodformDialog.data["goodsCode"] = ""; //商品编码
+					this.goodformDialog.data["goodsName"] = ""; //商品名称
+					this.goodformDialog.data["sellerUnit"] = ""; //成交单位编码
+					this.goodformDialog.data["sellerUnitName"] = ""; //成交单位
+					this.goodformDialog.data["arrivalGoodsCode"] = "";
+					this.goodformDialog.data["taxNo"] = ""; // 税号
+					this.goodformDialog.data["attachNo"] = ""; // 附号
+					this.goodformDialog.data["customTaxRate"] = ""; // 关税税率
+					this.goodformDialog.data["increaseTaxRate"] = ""; // 关税加征
+					this.goodformDialog.data["superviseMode"] = '' // 监管条件
+					this.goodformDialog.data["superviseModeName"] = '' //监管条件
+					this.goodformDialog.data["vatTaxRate"] = '' //进口增值税率
+			},
+
+			// ********************统计操纵
+
+			// 代理报检费
+			'data.agencyFee'(newVal, oldVal){
+				this.statisticsOther()
+			},
+
+			// 检疫费
+			'data.quarantineFee'(newVal, oldVal){
+				this.statisticsOther()
 			},
 			
 		},

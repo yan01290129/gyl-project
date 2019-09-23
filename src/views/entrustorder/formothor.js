@@ -5,11 +5,7 @@ let rules = {
 };
 export default [
   {
-    none: false,
-    disab: false,
-    nonetitle: false,
-    title: "统计",
-    text: false,
+    title: "其它统计",
     items: [
       {
         name: "agencyFee",
@@ -32,7 +28,7 @@ export default [
         label: "卖方销售总货值",
         type: "moneyselect",
         disabled: true,
-        selsect:'goodsValuecurrency',
+        selsect:'supplierCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -119,7 +115,7 @@ export default [
         label: "应退客户货款",
         type: "moneyselect",
         disabled: true,
-        selsect:'refundCustomerAmountcurrency',
+        selsect:'supplierCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -129,7 +125,7 @@ export default [
         label: "已付货款总额",
         type: "moneyselect",
         disabled: true,
-        selsect:'paidGoodsAmountcurrency',
+        selsect:'supplierCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
