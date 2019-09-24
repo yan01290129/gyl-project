@@ -86,6 +86,7 @@ export default [
         label: "成交数量",
         type: "num",
         decimal:0,
+        rules
       },
       {
         name: "sellerUnitName",
@@ -98,6 +99,7 @@ export default [
         name: "sellerPrice",
         label: "单价",
         type: "money",
+        rules
       },
       {
         name: "sellerCurrency",
@@ -148,6 +150,7 @@ export default [
         name: "freight",
         label: "运费",
         type: "money",
+        disabled: true,
       },
       {
         name: "premiumRate",
@@ -159,6 +162,7 @@ export default [
         name: "premium",
         label: "保费",
         type: "money",
+        disabled: true,
       },
       {
         name: "extrasRate",
@@ -170,11 +174,13 @@ export default [
         name: "extras",
         label: "杂费",
         type: "money",
+        disabled: true,
       },
       {
         name: "costAmount",
         label: "运保杂费额",
         type: "money",
+        disabled: true,
       },
     ]
   },

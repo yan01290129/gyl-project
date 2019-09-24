@@ -1,5 +1,6 @@
 <template>
   <el-input v-model="data" :disabled="disabled" :readonly="readonly" :placeholder="placeholder" @blur="onBlur">
+    <slot name="append" slot="append"></slot>
     <slot name="prepend" slot="prepend"></slot>
   </el-input>
 </template>

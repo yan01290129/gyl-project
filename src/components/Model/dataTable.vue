@@ -20,7 +20,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-table ref="table" border :data="data" highlight-current-row @current-change="currentSelected" size="small">
+    <el-table ref="table" border :data="data" highlight-current-row @current-change="currentSelected" @cell-dblclick="cellDblclick" size="small">
       <el-table-column type="selection" width="50" v-if="configs.selection === true"></el-table-column>
       <template v-for="(item,index) in configs.items">
         <el-table-column v-if="item.template === true" :width="item.width || 150" :key="index" :label="item.label">
@@ -82,6 +82,9 @@
 			},
 			currentSelected(currentRow) {
 				this.$emit('handlerCurrentSelected', currentRow)
+			},
+			cellDblclick(currentRow) {
+				this.$emit('handlerCellDblclick', currentRow)
 			},
 			operation(val) {
 				this.$emit("handlerOperation", val);

@@ -86,6 +86,7 @@ export default [
         label: "成交数量",
         type: "num",
         decimal:0,
+        rules
       },
       {
         name: "sellerUnitName",
@@ -98,6 +99,7 @@ export default [
         name: "sellerPrice",
         label: "单价",
         type: "money",
+        rules
       },
       {
         name: "sellerCurrency",
@@ -148,6 +150,7 @@ export default [
         name: "freight",
         label: "运费",
         type: "money",
+        disabled: true,
       },
       {
         name: "premiumRate",
@@ -159,6 +162,7 @@ export default [
         name: "premium",
         label: "保费",
         type: "money",
+        disabled: true,
       },
       {
         name: "extrasRate",
@@ -170,11 +174,13 @@ export default [
         name: "extras",
         label: "杂费",
         type: "money",
+        disabled: true,
       },
       {
         name: "costAmount",
         label: "运保杂费额",
         type: "money",
+        disabled: true,
       },
     ]
   },
@@ -203,12 +209,14 @@ export default [
         name: "customTaxRate",
         label: "关税税率(%)",
         type: "num",
+        disabled: true,
         ratio:true,
       },
       {
         name: "increaseTaxRate",
         label: "关税加征(%)",
         type: "num",
+        disabled: true,
         ratio:true,
       },
       {
@@ -222,7 +230,8 @@ export default [
       {
         name: "exciseTaxRate",
         label: "消费税率(%)",
-        type: "num",
+        type: "numbutton",
+        readonly: true,
         ratio:true,
       },
       {
@@ -257,6 +266,7 @@ export default [
         name: "otherTaxRate",
         label: "其他税率(%)",
         type: "num",
+        disabled: true,
         ratio:true,
       },
       {

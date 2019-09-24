@@ -1,6 +1,6 @@
 <template>
   <el-dialog class="formDialog" :close-on-click-modal="false" :title="title" :visible="visible" :before-close="handleClose">
-    <data-form :data.sync="data" :configs.sync="configs" @handlerInputChange='inputChange' @handlerPointSelection='pointSelection' @handlerSelectChange='selectChange' @handlerSwitchChange='switchChange' @handlerRadioChange='radioChange' @handlerOperation='operation'></data-form>
+    <data-form ref="formDialog" :data.sync="data" :configs.sync="configs" @handlerInputChange='inputChange' @handlerPointSelection='pointSelection' @handlerSelectChange='selectChange' @handlerSwitchChange='switchChange' @handlerRadioChange='radioChange' @handlerOperation='operation'></data-form>
 	<div class="operationDialogDiv">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>

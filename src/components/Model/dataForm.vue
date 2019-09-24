@@ -38,19 +38,22 @@
                       <el-checkbox v-for="(option,index) in item.options" :key="index" :label="option['value']">{{option['label']}}</el-checkbox>
                     </el-checkbox-group>
                     <!-- （下拉）数字框[支持计算] -->
-                    <number-input v-if="item.type=='num' || item.type=='numselect'" v-model.number="data[item.name]"  type="number" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入数字'">
+                    <number-input v-if="item.type=='num' || item.type=='numbutton' || item.type=='numselect'" v-model.number="data[item.name]"  type="number" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入数字'">
+                      <el-button v-if="item.type == 'numbutton' && item.disabled !== true" slot="append" icon="el-icon-search" @click="pointSelection(data,item)"></el-button>
                       <el-select v-if="item.type=='numselect'" slot="prepend" v-model="data[item.selsect]" :disabled="item.selsectDisabled" @change='selectChange(data,item)' :placeholder="item.placeholder || '请选择'">
                         <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
                       </el-select>
                     </number-input>
                     <!-- （下拉）金额框[支持计算] -->
                     <money-input v-if="item.type=='money' || item.type=='moneyselect'" v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" :symbol="item.symbol" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入金额'" class="text-r">
+                      <el-button v-if="item.type == 'moneybutton' && item.disabled !== true" slot="append" icon="el-icon-search" @click="pointSelection(data,item)"></el-button>
                       <el-select v-if="item.type=='moneyselect'" slot="prepend" v-model="data[item.selsect]" :disabled="item.selsectDisabled" @change='selectChange(data,item)' :placeholder="item.placeholder || '请选择'">
                         <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
                       </el-select>
                     </money-input>
                     <!-- （下拉）百分比框[支持计算] -->
                     <percent-input v-if="item.type=='percent' || item.type=='percentselect'" v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' :decimal="item.decimal" @change='inputChange(data,item)' :placeholder="item.placeholder || '请录入比率'" class="text-r">
+                      <el-button v-if="item.type == 'percentbutton' && item.disabled !== true" slot="append" icon="el-icon-search" @click="pointSelection(data,item)"></el-button>
                       <el-select v-if="item.type=='percentselect'" slot="prepend" v-model="data[item.selsect]" :disabled="item.selsectDisabled" @change='selectChange(data,item)' :placeholder="item.placeholder || '请选择'">
                         <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
                       </el-select>

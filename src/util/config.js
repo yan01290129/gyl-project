@@ -192,6 +192,63 @@ export default {
       console.log(e);
     }
   },
+  
+  /**
+   * @param {名称} 计算解析
+   */
+  calcConfig(data, calc,ratio, item) {
+    let symbol = ["+", "-", "*", "/", "(", ")",'1','2','3','4','5','6','7','8','9','0'];
+    var calclist = [calc];
+    for (let o = 0; o < symbol.length; o++) {
+      var val = [];
+      for (let i = 0; i < calclist.length; i++) {
+        let z = calclist[i].split(symbol[o]);
+        val.push(...z);
+      }
+      calclist = val;
+    }
+    for (let f = 0; f < calclist.length; f++) {
+      var key = calclist[f];
+      if(!key)return
+      if (data[key]) {
+        if(ratio.indexOf(key) != '-1'){
+          calc = calc.replace(key, data[key] + '/100'); //取值
+        }else{
+          calc = calc.replace(key, data[key])
+        }
+      }else{
+        calc = calc.replace(key, 0)
+        // 这里有个除以0的特殊情况
+        calc.replace('/0', '/1');
+      }
+    }
+    return parseFloat(eval(calc).toFixed(item.decimal || 4))
+  },
+
+  /**
+   * @param {名称} 计算
+   */
+  getCalcConfig(data, configs, formulalist, ratio) {
+    var caleData = {}
+    for (let formulaItem of formulalist) {
+      for (let config of configs) {
+        for (let item of config.items) {
+          let key = formulaItem.formula.split('=')[0].replace(/\s/g, '')
+          let calc = formulaItem.formula.split('=')[1].replace(/\s/g, '')
+          if(item.name == key && this.calcConfig(data,calc,ratio,item)){
+            let data = this.calcConfig(data,calc,ratio,item)
+            if(data){
+              // console.log(key,calc,caleData[key])
+              caleData[key] = this.calcConfig(data,calc,ratio,item)
+            }
+          }
+        }
+      }
+    }
+    return caleData
+  },
+
+
 
   /**
    * @param {名称} 登录
@@ -216,41 +273,4 @@ export default {
     }
   },
 
-  /**
-   * @param {名称} 触发栏位计算
-   */
-  getConfigCalc(data, configs) {
-    for (let config of configs) {
-      for (let item of config.items) {
-        if (item.type === "calc" && item.calc) {
-          data[item.name] = this.resCalc(data, item.calc);
-        }
-      }
-    }
-  },
-
-  /**
-   * @param {名称} 计算
-   */
-  calcConfig(data, calc) {
-    let symbol = ["+", "-", "*", "/", "(", ")"];
-    var calcval = [calc];
-    for (let o = 0; o < symbol.length; o++) {
-      var val = [];
-      for (let i = 0; i < calcval.length; i++) {
-        let z = calcval[i].split(symbol[o]);
-        val.push(...z);
-      }
-      calcval = val;
-    }
-    for (let f = 0; f < calcval.length; f++) {
-      var key = calcval[f].trim();
-      if (data[key]) {
-        calc = calc.replace(key, data[key]).replace(" ", ""); //取值
-      } else {
-        return "";
-      }
-    }
-    return eval(calc);
-  }
 };

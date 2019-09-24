@@ -22,6 +22,17 @@ import agreementsolutionRuleConfigs from "../agreementsolution/rule";
 // 商品
 import materielbase from "../materielbase/table";
 import materielbaseRuleConfigs from "../materielbase/rule";
+import brand from "../brand/table";
+import brandRuleConfigs from "../brand/rule";
+import origin from "../origin/table";
+import originRuleConfigs from "../origin/rule";
+import measurement from "../measurement/table";
+import measurementRuleConfigs from "../measurement/rule";
+import supervisioncondition from "../supervisioncondition/table";
+import supervisionconditionRuleConfigs from "../supervisioncondition/rule";
+import taxcategory from "../taxcategory/table";
+import taxcategoryRuleConfigs from "../taxcategory/rule";
+
 
 const TABLE_lIMIT = {
   clientContactName: {
@@ -124,7 +135,42 @@ const TABLE_CONFIGS = {
     ruleConfigs: materielbaseRuleConfigs,
     configs: materielbase
   },
-  
+  brandName:{
+    title: "品牌列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: brandRuleConfigs,
+    configs: brand
+  },
+  sourceAreaName:{
+    title: "原产地列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: originRuleConfigs,
+    configs: origin
+  },
+  sellerUnitName:{
+    title: "单位列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: measurementRuleConfigs,
+    configs: measurement
+  },
+  superviseModeName:{
+    title: "监管方式列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: supervisionconditionRuleConfigs,
+    configs: supervisioncondition
+  },
+  exciseTaxRate:{
+    title: "税种信息列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: taxcategoryRuleConfigs,
+    configs: taxcategory
+  },
+  taxTypeName:{
+    title: "税种信息列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: taxcategoryRuleConfigs,
+    configs: taxcategory
+  },
 };
 
 const TABLE_WRITE = {
@@ -209,6 +255,31 @@ const TABLE_WRITE = {
   orderModel:{
     arrivalGoodsModel: "specificationType",//来货规格型号
   },
+  brandName:{
+    brand: "brandCode",
+    brandName: "brandName",
+  },
+  sourceAreaName:{
+    sourceArea: "originCode",
+    sourceAreaName: "originName",
+  },
+  sellerUnitName:{
+    sellerUnit: "measurementCode",
+    sellerUnitName: "measurementUnit",
+  },
+  superviseModeName:{
+    superviseMode: "billCode",
+    superviseModeName: "billName",
+  },
+  exciseTaxRate:{
+    exciseTaxRate: "tax",
+    originName: "originName",
+  },
+  taxTypeName:{
+    taxTypeName: "taxCategoryName",
+    otherTaxRate: "tax",
+  },
+
 };
 
 export default {

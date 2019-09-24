@@ -68,7 +68,7 @@ export default {
     });
   },
 
-  // 委托订单-新增
+  // 委托订单 新增
   addEntrustorderData(data) {
     return request({
       url: '/entrustorder/',
@@ -77,11 +77,38 @@ export default {
     });
   },
 
-  // 委托订单-修改
+  // 委托订单 修改
   editEntrustorderData(data) {
     return request({
       url: '/entrustorder/',
       method: "PUT",
+      data
+    });
+  },
+
+  // 委托订单 商品 新增
+  addEntrustorderGoodsData(data) {
+    return request({
+      url: '/entrustgoods/',
+      method: "POST",
+      data
+    });
+  },
+
+  // 委托订单 商品 修改
+  editEntrustorderGoodsData(data) {
+    return request({
+      url: '/entrustgoods/',
+      method: "PUT",
+      data
+    });
+  },
+
+  // 委托订单 商品 全部替换
+  updEntrustorderGoodsReplaceData(code, data) {
+    return request({
+      url: `/entrustgoods/replace/${code}`,
+      method: "POST",
       data
     });
   },

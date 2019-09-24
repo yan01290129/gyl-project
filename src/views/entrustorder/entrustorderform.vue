@@ -41,11 +41,11 @@
     <!--统计--->
     <el-divider v-if="tabIsDisabled" content-position="left">统计</el-divider>
     <data-table v-if="tabIsDisabled" v-loading='goodsAll.statisticsloading' :data.sync="goodsAll.statisticsData" :count="1" :ruleData={} :configs.sync="goodsAll.statisticsConfigs"></data-table>
-    <data-form v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
+    <data-form ref="othorform" v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
     <!--弹窗--->
     <data-table-dialog v-loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
-    <data-form-dialog v-loading='goodformDialog.loading' :title.sync='goodformDialog.title' :visible.sync='goodformDialog.visible' :data.sync='goodformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood' @handlerPointSelection='fromDialogPointSelectionGoods'></data-form-dialog>
-    <data-form-dialog v-loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelectionTrusteepanyment'></data-form-dialog>
+    <data-form-dialog ref="goodsform" v-loading='goodsformDialog.loading' :title.sync='goodsformDialog.title' :visible.sync='goodsformDialog.visible' :data.sync='goodsformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodsformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood' @handlerPointSelection='fromDialogPointSelectionGoods'></data-form-dialog>
+    <data-form-dialog ref="trusteepanymentform" v-loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelectionTrusteepanyment'></data-form-dialog>
   </div>
 </template>
 
@@ -205,7 +205,7 @@
 				statisticsData:[],
 				statisticsConfigs:statisticsConfigsTable,
 			},
-			goodformDialog:{
+			goodsformDialog:{
 				title:'委托订单',
 				visible:false,
 				loading:false,
@@ -226,6 +226,7 @@
 			},
 			writeback:false, // 回写
 			childwriteback:false, // 回写
+			childType:'', // 子表操作类型
 			standardcurrency: '3', // 本位币
 			formulalist:'', //  公式
 			
@@ -289,7 +290,7 @@
 
 			// 协议公式  依赖条件
 			calculationFormula(){
-				if(this.data.solutionNo && (!this.writeback)){
+				if(this.data.solutionNo){
 					return JSON.stringify({solutionNo:this.data.solutionNo})
 				}
 			},
@@ -315,8 +316,12 @@
 			
 			// 商品弹窗表单
 			goodsConfigsFormfile(){
+				// 进口 没有报关相关的项
+				// 出口 没有出口退税项
+				// 其他 买方货款汇率单价可录入 
 				if(this.data.entrustOrderType == '1'){
-					var configs = this.goodformDialog.configsImported
+					var configs = this.goodsformDialog.configsImported
+					// 保运杂
 					if(this.data.dealMode == "2"){//CIF && 进口
 						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
 						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
@@ -328,11 +333,11 @@
 					if(this.data.dealMode == "4"){//C&I && 进口
 						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
 					}
-					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})//退税率%
 					return configs
 				}
 				if(this.data.entrustOrderType == '2'){
-					var configs = this.goodformDialog.configsExit
+					var configs = this.goodsformDialog.configsExit
+					// 保运杂
 					if(this.data.dealMode == "1"){//FOB && 出口
 						configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
 						configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
@@ -349,20 +354,25 @@
 					return configs
 				}
 				if(this.data.entrustOrderType == '3'){
-					var configs = this.goodformDialog.configsDomestic
-					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})
+					var configs = this.goodsformDialog.configsDomestic
+					// 买方采购
+					configs = utils.setConfigForm(configs,'buyerExchangeRate',{disabled:false})
+					configs = utils.setConfigForm(configs,'buyerPrice',{disabled:false})
 					return configs
 				}
 				if(this.data.entrustOrderType == '4'){
-					var configs = this.goodformDialog.configsDomestic
-					//C&I && 出口
+					var configs = this.goodsformDialog.configsDomestic
+					// 保运杂
 					configs = utils.setConfigForm(configs,'freightRate',{disabled:true})
 					configs = utils.setConfigForm(configs,'premiumRate',{disabled:true})
 					configs = utils.setConfigForm(configs,'extrasRate',{disabled:true})
 					configs = utils.setConfigForm(configs,'drawbackRate',{disabled:true})
+					// 买方采购
+					configs = utils.setConfigForm(configs,'buyerExchangeRate',{disabled:false})
+					configs = utils.setConfigForm(configs,'buyerPrice',{disabled:false})
 					return configs
 				}
-				return configs
+				return this.goodsformDialog.configs
 			},
 		},
 		methods: {
@@ -386,6 +396,13 @@
 			operation(val){
 				if(val == 'save'){
 					this.$refs['mainform'].$refs['form'].validate(async (valid) => {
+						if(this.status){
+							this.$refs['othorform'].$refs['form'].validate(async (validothor) => {
+								if (!valid) {
+									return false;
+								}
+							})
+						}
 						if (valid) {
 							try {
 								this.loading = true
@@ -398,8 +415,6 @@
 							} finally {
 								this.loading = false
 							}
-						} else {
-							return false;
 						}
 					});
 				}
@@ -453,23 +468,25 @@
 			// 商品操作按钮事件
 			async childOperationGood(val){
 				if(val == 'add'){
+					this.childType = 'add'
 					this.childwriteback= true
-					this.goodformDialog.data = {}
+					this.goodsformDialog.data = {}
 					//海关汇率
 					await this.gethgtimeExchangerate()
 					// 货款汇率 = 订单汇率 / 买方汇率
-					this.$set(this.goodformDialog.data,'buyerExchangeRate',parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6)))
-					this.childwriteback= true
-					this.goodformDialog.visible = true
+					this.$set(this.goodsformDialog.data,'buyerExchangeRate',parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6)))
+					this.childwriteback= false
+					this.goodsformDialog.visible = true
 				}
 				if(val == 'upd'){
 					if(!this.goods.currentRow){
 						return this.$message({ message: '请选择记录', type: 'warning',center: true });
 					}
+					this.childType = 'upd'
 					this.childwriteback= true
-					this.goodformDialog.data = this.goods.currentRow
-					this.childwriteback= true
-					this.goodformDialog.visible = true
+					this.goodsformDialog.data = this.goods.currentRow
+					this.childwriteback= false
+					this.goodsformDialog.visible = true
 				}
 				if(val == 'del'){
 				}
@@ -481,7 +498,7 @@
 				let date = this.data.signDate.slice(0, 7)
 				let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',this.data.supplierCurrency);
 				let val = await utils.getCustomsExchangerate(date,currencyName)
-				this.$set(this.goodformDialog.data,'customsExchangeRate',val)
+				this.$set(this.goodsformDialog.data,'customsExchangeRate',val)
 				if(!val){
 					this.$message({ message: '获取海关汇率失效', type: 'warning',center: true });	
 				}
@@ -557,10 +574,10 @@
 			async DialogloadConfigSelect(activeName){
 				if(this.status == '2') return
 				this[activeName].loading = true
-				if(activeName == 'goodformDialog'){
-					this.goodformDialog.configsImported = [...await utils.setConfigFormSelect(this.goodformDialog.configsImported)]
-					this.goodformDialog.configsExit = [...await utils.setConfigFormSelect(this.goodformDialog.configsExit)]
-					this.goodformDialog.configsDomestic = [...await utils.setConfigFormSelect(this.goodformDialog.configsDomestic)]
+				if(activeName == 'goodsformDialog'){
+					this.goodsformDialog.configsImported = [...await utils.setConfigFormSelect(this.goodsformDialog.configsImported)]
+					this.goodsformDialog.configsExit = [...await utils.setConfigFormSelect(this.goodsformDialog.configsExit)]
+					this.goodsformDialog.configsDomestic = [...await utils.setConfigFormSelect(this.goodsformDialog.configsDomestic)]
 				}
 				if(activeName == 'trusteepanymentformDialog'){
 					this.trusteepanymentformDialog.configs = [...await utils.setConfigFormSelect(this.trusteepanymentformDialog.configs)]
@@ -571,9 +588,27 @@
 			// 商品操作按钮事件
 			async fromDialogOperationGood(val){
 				if(val == 'cancel'){
-					this.goodformDialog.visible = false
+					this.goodsformDialog.visible = false
 				}
 				if(val == 'confirm'){
+					this.$refs['goodsform'].$refs['formDialog'].$refs['form'].validate(async (valid) => {
+						if (valid) {
+							try {
+								this.loading = true
+								const data = this.childType == 'upd' ? await api.editEntrustorderGoodsData(this.goodsformDialog.data) : await api.addEntrustorderGoodsData(this.goodsformDialog.data)
+								this.$message({ message: '保存成功', type: 'success',center: true });
+								this.goodsformDialog.visible = false
+								this.childGetTableList('goods')
+							} catch (error) {
+								this.$message({ message: '保存失败', type: 'warning',center: true });
+								return Promise.reject(error)
+							} finally {
+								this.loading = false
+							}
+						} else {
+							return false;
+						}
+					});
 				}
 			},
 
@@ -593,7 +628,7 @@
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
 				this.tableDialog.item = item
-				this.tableDialog.itemform = 'goodformDialog'
+				this.tableDialog.itemform = 'goodsformDialog'
 				this.tableDialog.visible = true
     			this.tableDialog.loading = true
 				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
@@ -614,6 +649,16 @@
 				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
 				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
     			this.tableDialog.loading = false
+			},
+
+			// 商品自动计算
+			autoCalculation(data){
+				data = {...this.data,...data}
+				let ratio = ['serviceTaxRate','freightRate','premiumRate','extrasRate','customTaxRate','increaseTaxRate','exciseTaxRate','otherTaxRate','serviceExchangeRate','drawbackRate']
+				let caleData = utils.getCalcConfig(data, this.goodsConfigsFormfile, this.formulalist, ratio)
+				for (let key in caleData) {
+					this.$set(this.goodsformDialog.data, key, caleData[key])
+				}
 			},
 
 			// *********************************弹窗表格*****************************
@@ -637,10 +682,7 @@
 					}
 					const writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow)
 					if(this.tableDialog.itemform){
-						for (let key in writeVla) {
-							this.$set(this[this.tableDialog.itemform].data, key, writeVla[key])
-						}
-						// this[this.tableDialog.itemform].data = {...this[this.tableDialog.itemform].data,...writeVla}
+						this[this.tableDialog.itemform].data = {...this[this.tableDialog.itemform].data,...writeVla}
 					}else{
 						this.data = {...this.data,...writeVla}
 					}
@@ -781,9 +823,9 @@
 				this.optionConfigs = [],this.custom.optionConfigs = []
 				this.custom.configsImported = [...utils.setConfigFormOfText(this.custom.configsImported)]
 				this.custom.configsExit = [...utils.setConfigFormOfText(this.custom.configsExit)]
-				this.goodformDialog.configsImported = [...utils.setConfigFormOfText(this.goodformDialog.configsImported)]
-				this.goodformDialog.configsExit = [...utils.setConfigFormOfText(this.goodformDialog.configsExit)]
-				this.goodformDialog.configsDomestic = [...utils.setConfigFormOfText(this.goodformDialog.configsDomestic)]
+				this.goodsformDialog.configsImported = [...utils.setConfigFormOfText(this.goodsformDialog.configsImported)]
+				this.goodsformDialog.configsExit = [...utils.setConfigFormOfText(this.goodsformDialog.configsExit)]
+				this.goodsformDialog.configsDomestic = [...utils.setConfigFormOfText(this.goodsformDialog.configsDomestic)]
 				this.trusteepanymentformDialog.configs = [...utils.setConfigFormOfText(this.trusteepanymentformDialog.configs)]
 			}
 			this.writeback = false
@@ -814,8 +856,8 @@
 					// 表单限制操作
 					this.status == '2' && (this.custom.configs = [...utils.setConfigFormOfText(this.custom.configs)], this.custom.optionConfigs = [])
 					// 初始化弹窗表单
-					this.goodformDialog.data = utils.inntForm(this.goodformDialog.data,this.goodformDialog.configs)
-					this.DialogloadConfigSelect('goodformDialog')
+					this.goodsformDialog.data = utils.inntForm(this.goodsformDialog.data,this.goodsformDialog.configs)
+					this.DialogloadConfigSelect('goodsformDialog')
 				}
 			},
 			'goods.ruleData': {
@@ -944,7 +986,7 @@
 
 			// 公式依赖
 			async calculationFormula(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
+				if(!newVal)return
 				let obj = JSON.parse(newVal)
 				this.formulalist = await utils.getCalculationFormula(obj.solutionNo)
 				let defaultlist = [
@@ -970,6 +1012,7 @@
 				if(this.status && (!oldVal))return // 修改回写
 				// 重新计算
 				console.log('重新计算')
+				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
 			},
 
 			// 公式
@@ -977,15 +1020,28 @@
 				if(this.status && (!oldVal))return // 修改回写
 				// 重新计算
 				console.log('重新计算')
+				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
 			},
 
-			'goodformDialog.data'(newVal, oldVal){
+			'goodsformDialog.data'(newVal, oldVal){
 				if(this.status && (!oldVal))return // 修改回写
 				// 重新计算
 				console.log('重新计算')
+				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
 			},
 
-			async 'goodformDialog.data.arrivalGoodsModel'(newVal, oldVal){
+			// 单挑触发计算
+			'goodsformDialog.data': {
+				handler (newVal, oldVal) {
+					if(this.childwriteback) return
+					// console.log(JSON.stringify(newVal), JSON.stringify(oldVal))
+					// if(JSON.stringify(newVal) == JSON.stringify(oldVal))return
+					this.autoCalculation(this.goodsformDialog.data,this.formulalist)
+				},
+				deep: true
+			},
+
+			async 'goodsformDialog.data.arrivalGoodsModel'(newVal, oldVal){
 				if(this.childwriteback) return
 				// 来货规格型号
 				if (newVal) {
@@ -996,20 +1052,20 @@
 						if (list.length > 0) {
 							// 录入
 							let rowData = list[0]
-							this.goodformDialog.data["orderModel"] = rowData["materielCode"]; //来货编码
-							this.goodformDialog.data["arrivalGoodsName"] = rowData["tradeName"]; //来货名称
-							this.goodformDialog.data["goodsCode"] = rowData["materielCode"]; //商品编码
-							this.goodformDialog.data["goodsName"] = rowData["customsAbbreviation"]; //商品名称
-							this.goodformDialog.data["sellerUnit"] = rowData["measurementUnit"]; //成交单位编码
-							this.goodformDialog.data["sellerUnitName"] = rowData["measurementUnitName"]; //成交单位
-							this.goodformDialog.data["arrivalGoodsCode"] = rowData["materielCode"];
-							this.goodformDialog.data["taxNo"] = rowData["taxNo"]; // 税号
-							this.goodformDialog.data["attachNo"] = rowData["attachNo"]; // 附号
-							this.goodformDialog.data["customTaxRate"] = rowData["customsRate"]; // 关税税率
-							this.goodformDialog.data["increaseTaxRate"] = rowData["levyRate"]// 关税加征
-							this.goodformDialog.data["superviseMode"] = rowData["superCondition"] // 监管条件
-							this.goodformDialog.data["superviseModeName"] = rowData["superConditionName"] //监管条件
-							this.goodformDialog.data["vatTaxRate"] = rowData["valueAddRate"] //进口增值税率
+							this.goodsformDialog.data["orderModel"] = rowData["materielCode"]; //来货编码
+							this.goodsformDialog.data["arrivalGoodsName"] = rowData["tradeName"]; //来货名称
+							this.goodsformDialog.data["goodsCode"] = rowData["materielCode"]; //商品编码
+							this.goodsformDialog.data["goodsName"] = rowData["customsAbbreviation"]; //商品名称
+							this.goodsformDialog.data["sellerUnit"] = rowData["measurementUnit"]; //成交单位编码
+							this.goodsformDialog.data["sellerUnitName"] = rowData["measurementUnitName"]; //成交单位
+							this.goodsformDialog.data["arrivalGoodsCode"] = rowData["materielCode"];
+							this.goodsformDialog.data["taxNo"] = rowData["taxNo"]; // 税号
+							this.goodsformDialog.data["attachNo"] = rowData["attachNo"]; // 附号
+							this.goodsformDialog.data["customTaxRate"] = rowData["customsRate"]; // 关税税率
+							this.goodsformDialog.data["increaseTaxRate"] = rowData["levyRate"]// 关税加征
+							this.goodsformDialog.data["superviseMode"] = rowData["superCondition"] // 监管条件
+							this.goodsformDialog.data["superviseModeName"] = rowData["superConditionName"] //监管条件
+							this.goodsformDialog.data["vatTaxRate"] = rowData["valueAddRate"] //进口增值税率
 							return
 						}
 					} catch (e) {
@@ -1017,20 +1073,20 @@
 					}
 				}
 				// 清除
-				this.goodformDialog.data["orderModel"] = ""; //来货编码
-				this.goodformDialog.data["arrivalGoodsName"] = ""; //来货名称
-				this.goodformDialog.data["goodsCode"] = ""; //商品编码
-				this.goodformDialog.data["goodsName"] = ""; //商品名称
-				this.goodformDialog.data["sellerUnit"] = ""; //成交单位编码
-				this.goodformDialog.data["sellerUnitName"] = ""; //成交单位
-				this.goodformDialog.data["arrivalGoodsCode"] = "";
-				this.goodformDialog.data["taxNo"] = ""; // 税号
-				this.goodformDialog.data["attachNo"] = ""; // 附号
-				this.goodformDialog.data["customTaxRate"] = ""; // 关税税率
-				this.goodformDialog.data["increaseTaxRate"] = ""; // 关税加征
-				this.goodformDialog.data["superviseMode"] = '' // 监管条件
-				this.goodformDialog.data["superviseModeName"] = '' //监管条件
-				this.goodformDialog.data["vatTaxRate"] = '' //进口增值税率
+				this.goodsformDialog.data["orderModel"] = ""; //来货编码
+				this.goodsformDialog.data["arrivalGoodsName"] = ""; //来货名称
+				this.goodsformDialog.data["goodsCode"] = ""; //商品编码
+				this.goodsformDialog.data["goodsName"] = ""; //商品名称
+				this.goodsformDialog.data["sellerUnit"] = ""; //成交单位编码
+				this.goodsformDialog.data["sellerUnitName"] = ""; //成交单位
+				this.goodsformDialog.data["arrivalGoodsCode"] = "";
+				this.goodsformDialog.data["taxNo"] = ""; // 税号
+				this.goodsformDialog.data["attachNo"] = ""; // 附号
+				this.goodsformDialog.data["customTaxRate"] = ""; // 关税税率
+				this.goodsformDialog.data["increaseTaxRate"] = ""; // 关税加征
+				this.goodsformDialog.data["superviseMode"] = '' // 监管条件
+				this.goodsformDialog.data["superviseModeName"] = '' //监管条件
+				this.goodsformDialog.data["vatTaxRate"] = '' //进口增值税率
 			},
 
 			// ********************统计操纵

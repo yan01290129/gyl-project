@@ -73,6 +73,12 @@ export default [
         disabled: true,
       },
       {
+        name: "numbutton",
+        type: "numbutton",
+        label: "数字点选框",
+        disabled: true,
+      },
+      {
         type: "numselect",
         label: "下拉数字框",
         name: "numselect",
@@ -92,6 +98,12 @@ export default [
         disabled: true,
       },
       {
+        name: "moneybutton",
+        type: "moneybutton",
+        label: "金额点选框",
+        disabled: true,
+      },
+      {
         selsect: "moneyselectSelect",
         type: "moneyselect",
         label: "下拉金额框",
@@ -108,6 +120,12 @@ export default [
         name: "percent",
         type: "percent",
         label: "百分比框"
+      },
+      {
+        name: "percentbutton",
+        type: "percentbutton",
+        label: "百分比点选框",
+        disabled: true,
       },
       {
         name: "percentselect",
