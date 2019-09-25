@@ -202,6 +202,7 @@ export default [
         name: "serviceExchangeRate",
         label: "费率(%)",
         type: "num",
+        disabled: true
       },
       {
         name: "serviceCurrency",

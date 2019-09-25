@@ -104,6 +104,14 @@ export default {
     });
   },
 
+  // 委托订单 商品 删除
+  delEntrustorderGoodsData(code, data) {
+    return request({
+      url: `/entrustgoods/${code}`,
+      method: "DELETE"
+    });
+  },
+
   // 委托订单 商品 全部替换
   updEntrustorderGoodsReplaceData(code, data) {
     return request({

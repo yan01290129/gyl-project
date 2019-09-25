@@ -250,7 +250,6 @@ export default [
         name: "serviceTaxRate",
         label: "服务费率(%)",
         type: "num",
-        ratio:true,
         disabled: true,
         rules
       },

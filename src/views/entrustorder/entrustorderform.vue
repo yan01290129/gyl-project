@@ -270,20 +270,20 @@
 				}
 			},
 
-			// 卖方汇率  依赖条件
-			buyerExchangeRate(){
-				if(this.data.signDate && this.data.currency && (!this.writeback)){
+			// 卖方汇率条件
+			orderExchangeRate(){
+				if(this.data.signDate && this.data.supplierCurrency){
 					let date = this.data.signDate.slice(0, 10)
-					let currencyName = utils.getConfigFormOfSelect(this.configs,'currency',this.data.currency);
+					let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',this.data.supplierCurrency);
 					return JSON.stringify({date,currencyName})
 				}
 			},
 
-			// 买方汇率  依赖条件
-			orderExchangeRate(){
-				if(this.data.signDate && this.data.supplierCurrency && (!this.writeback)){
+			// 买方汇率条件
+			buyerExchangeRate(){
+				if(this.data.signDate && this.data.currency){
 					let date = this.data.signDate.slice(0, 10)
-					let currencyName = utils.getConfigFormOfSelect(this.configs,'supplierCurrency',this.data.supplierCurrency);
+					let currencyName = utils.getConfigFormOfSelect(this.configs,'currency',this.data.currency);
 					return JSON.stringify({date,currencyName})
 				}
 			},
@@ -409,6 +409,7 @@
 								const data = this.status ? await api.editEntrustorderData(this.data) : await api.addEntrustorderData(this.data)
 								this.$message({ message: '保存成功', type: 'success',center: true });
 								this.data = data
+								if(!this.data.status)this.data.status = 1
 							} catch (error) {
 								this.$message({ message: '保存失败', type: 'warning',center: true });
 								return Promise.reject(error)
@@ -447,6 +448,7 @@
 					const { list, count } = await utils.getConfigTable(this[activeName].configs.api, this[activeName].ruleData)
 					this[activeName].data = list
 					this[activeName].count = count
+					this[activeName].currentRow = ''
 				} catch (error) {
 					this.$message({ message: '获取数据失败', type: 'warning',center: true });
 					return Promise.reject(error)
@@ -471,15 +473,15 @@
 					this.childType = 'add'
 					this.childwriteback= true
 					this.goodsformDialog.data = {}
-					//	卖方买方服务费币别费率
+					this.goodsformDialog.data.entrustOrderNo = this.data.entrustOrderNo
+					this.goodsformDialog.data.serviceCurrency = this.standardcurrency // 服务费币别本位币
+					await this.gethgtimeExchangerate() //海关汇率
+					// 子表受主表影响的字段-------	卖方币别，买方币别，服务费率(定额服务费)，货款汇率
 					this.goodsformDialog.data.sellerCurrency = this.data.supplierCurrency
 					this.goodsformDialog.data.buyerCurrency = this.data.currency
-					this.goodsformDialog.data.serviceCurrency = this.standardcurrency
 					this.goodsformDialog.data.serviceExchangeRate = this.data.serviceTaxRate
-					//海关汇率
-					await this.gethgtimeExchangerate()
-					// 货款汇率 = 订单汇率 / 买方汇率
-					this.$set(this.goodsformDialog.data,'buyerExchangeRate',parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6)))
+					this.goodsformDialog.data.buyerExchangeRate = parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6))
+					this.goodsformDialog.data = {...this.goodsformDialog.data}
 					this.childwriteback= false
 					this.goodsformDialog.visible = true
 				}
@@ -494,6 +496,24 @@
 					this.goodsformDialog.visible = true
 				}
 				if(val == 'del'){
+					if(!this.goods.currentRow){
+						return this.$message({ message: '请选择记录', type: 'warning',center: true });
+					}
+					try {
+						this.goods.loading = true
+						const data = api.delEntrustorderGoodsData(this.goods.currentRow.itemCode)
+						this.$message({ message: '删除成功', type: 'success',center: true });
+						this.goods.loading = false
+						this.childGetTableList('goods')
+						this.childGetTableGoodAll()
+					} catch (error) {
+						this.$message({ message: '获取数据失败', type: 'warning',center: true });
+						return Promise.reject(error)
+					} finally {
+						this.custom.loading = false
+					}
+					
+
 				}
 			},
 
@@ -604,6 +624,7 @@
 								this.$message({ message: '保存成功', type: 'success',center: true });
 								this.goodsformDialog.visible = false
 								this.childGetTableList('goods')
+								this.childGetTableGoodAll()
 							} catch (error) {
 								this.$message({ message: '保存失败', type: 'warning',center: true });
 								return Promise.reject(error)
@@ -667,9 +688,7 @@
 				if(data.vatTaxRate == '5')data.vatTaxRate = 0
 				let ratio = ['serviceTaxRate','freightRate','premiumRate','extrasRate','customTaxRate','increaseTaxRate','exciseTaxRate','vatTaxRate','otherTaxRate','serviceExchangeRate','drawbackRate']
 				let caleData = utils.getCalcConfig(data, this.goodsConfigsFormfile, this.formulalist, ratio)
-				for (let key in caleData) {
-					this.$set(this.goodsformDialog.data, key, caleData[key])
-				}
+				return caleData
 			},
 
 			// *********************************弹窗表格*****************************
@@ -704,13 +723,27 @@
 				}
 			},
 
+			// 获取所以商品列表数据
+			async childGetTableListAllGood() {
+				try {
+					this.goods.loading = true
+					this.goodsAll.statisticsloading = true
+					const { list } = await utils.getConfigTable(this['goods'].configs.api, {entrustOrderNo:this.data.entrustOrderNo})
+					this.goodsAll.data = list
+				} catch (error) {
+					this.$message({ message: '获取数据失败', type: 'warning',center: true });
+					return Promise.reject(error)
+				} finally {
+					this.goods.loading = false
+					this.goodsAll.statisticsloading = false
+				}
+			},
+
 			// 统计
 			async childGetTableGoodAll() {
 				try {
 					// 获取所有商品
-					this.goodsAll.statisticsloading = true
-					const { list } = await utils.getConfigTable(this['goods'].configs.api, {entrustOrderNo:this.data.entrustOrderNo})
-					this.goodsAll.data = list
+					await this.childGetTableListAllGood()
 					// 计算统计数据
 					let data = {
 						goodsValue: 0, /* 卖方销售货价 */
@@ -805,7 +838,40 @@
 						advanceAmount = totalServiceCharge + this.data.agencyFee + this.data.quarantineFee + (this.data.goodsValue / this.data.buyerExchangeRate)
 					}
 					this.$set(this.data, 'advanceAmount', advanceAmount)
+			},
+
+			// 重新计算所有商品
+			async updEntrustorderGoodsReplaceData(){
+				if(!this.goodsAll.data.length)return
+				var data = []
+				for (let item of this.goodsAll.data) {
+					let upobj = {}
+					// 子表受主表影响的字段-------	卖方币别，买方币别，服务费率(定额服务费)，货款汇率
+					upobj.sellerCurrency = this.data.supplierCurrency
+					upobj.buyerCurrency = this.data.currency
+					upobj.serviceExchangeRate = this.data.serviceTaxRate
+					upobj.buyerExchangeRate = parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6))
+					item = {...item,...upobj}
+					let caleData = this.autoCalculation(item,this.formulalist)
+					item = {...item,...caleData}
+					data.push(item)
+				}
+				try {
+					this.goods.loading = true
+					this.goodsAll.statisticsloading = true
+					await api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,data)
+					this.childGetTableList('goods')
+					this.$message({ message: '商品信息已重新计算！', type: 'success',center: true });
+				} catch (error) {
+					this.$message({ message: '更新商品信息失败！', type: 'warning',center: true });
+					return Promise.reject(error)
+				} finally {
+					this.goods.loading = false
+					this.goodsAll.statisticsloading = false
+				}
 			}
+
+
 			
 			
 		},
@@ -973,23 +1039,23 @@
 
 			// **************商品操作
 
-			// 卖方汇率依赖
-			async buyerExchangeRate(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
-				let obj = JSON.parse(newVal)
-				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
-				this.$set(this.data,'buyerExchangeRate',val)
-				if(!val){
-					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
-				}
-			},
-
-			// 买方汇率依赖
+			// 通过计算属性更新卖方汇率
 			async orderExchangeRate(newVal, oldVal){
 				if(this.status && (!oldVal))return // 修改回写
 				let obj = JSON.parse(newVal)
 				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
 				this.$set(this.data,'orderExchangeRate',val)
+				if(!val){
+					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
+				}
+			},
+
+			// 通过计算属性更新买方汇率依赖
+			async buyerExchangeRate(newVal, oldVal){
+				if(this.status && (!oldVal))return // 修改回写
+				let obj = JSON.parse(newVal)
+				let val = await utils.getExchangeRate(obj.date,obj.currencyName)
+				this.$set(this.data,'buyerExchangeRate',val)
 				if(!val){
 					this.$message({ message: '获取汇率失效', type: 'warning',center: true });	
 				}
@@ -1012,42 +1078,45 @@
 			},
 
 			// 卖方汇率
-			'data.buyerExchangeRate'(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
-				// 重新计算
-				console.log('重新计算')
+			'data.orderExchangeRate'(newVal, oldVal){
+				if(!this.status)return // 新增
+				if(this.status && (!oldVal))return // 回写
+				// 所有重新计算
+				this.updEntrustorderGoodsReplaceData()
 			},
 
 			// 买方汇率
-			'data.orderExchangeRate'(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
-				// 重新计算
-				console.log('重新计算')
-				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
+			'data.buyerExchangeRate'(newVal, oldVal){
+				if(!this.status)return // 新增
+				if(this.status && (!oldVal))return // 回写
+				// 所有重新计算
+				this.updEntrustorderGoodsReplaceData()
+			},
+
+			// 服务费率
+			'data.serviceTaxRate'(newVal, oldVal){
+				if(!this.status)return // 新增
+				if(this.status && (!oldVal))return // 回写
+				// 所有重新计算
+				this.updEntrustorderGoodsReplaceData()
 			},
 
 			// 公式
 			formulalist(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
-				// 重新计算
-				console.log('重新计算')
-				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
+				if(!this.status)return // 新增
+				if(this.status && (!oldVal))return // 回写
+				// 所有重新计算
+				this.updEntrustorderGoodsReplaceData()
 			},
 
-			'goodsformDialog.data'(newVal, oldVal){
-				if(this.status && (!oldVal))return // 修改回写
-				// 重新计算
-				console.log('重新计算')
-				//api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,this.goods.data)
-			},
-
-			// 单挑触发计算
+			 // 单条重新计算
 			'goodsformDialog.data': {
 				handler (newVal, oldVal) {
 					if(this.childwriteback) return
-					// console.log(JSON.stringify(newVal), JSON.stringify(oldVal))
-					// if(JSON.stringify(newVal) == JSON.stringify(oldVal))return
-					this.autoCalculation(this.goodsformDialog.data,this.formulalist)
+					let caleData = this.autoCalculation(this.goodsformDialog.data,this.formulalist)
+					for (let key in caleData) {
+						this.$set(this.goodsformDialog.data, key, caleData[key])
+					}
 				},
 				deep: true
 			},

@@ -142,7 +142,6 @@ export default [
         name: "freightRate",
         label: "运费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "freight",
@@ -154,7 +153,6 @@ export default [
         name: "premiumRate",
         label: "保费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "premium",
@@ -166,7 +164,6 @@ export default [
         name: "extrasRate",
         label: "杂费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "extras",
@@ -213,14 +210,12 @@ export default [
         label: "关税税率(%)",
         type: "num",
         disabled: true,
-        ratio:true,
       },
       {
         name: "increaseTaxRate",
         label: "关税加征(%)",
         type: "num",
         disabled: true,
-        ratio:true,
       },
       {
         name: "customTaxAmount",
@@ -235,7 +230,6 @@ export default [
         label: "消费税率(%)",
         type: "numbutton",
         readonly: true,
-        ratio:true,
       },
       {
         name: "exciseTax",
@@ -270,7 +264,6 @@ export default [
         label: "其他税率(%)",
         type: "num",
         disabled: true,
-        ratio:true,
       },
       {
         name: "otherTaxAmount",
@@ -361,7 +354,6 @@ export default [
         name: "drawbackRate",
         label: "退税率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "drawback",
