@@ -11,13 +11,11 @@ export default [
         name: "orderModel",
         type: "inputbutton",
         label: "来货编码",
-        // readonly: true,
       },
       {
         name: "arrivalGoodsModel",
         type: "inputbutton",
         label: "来货规格型号",
-        // readonly: true,
         rules
       },
       {
@@ -144,7 +142,6 @@ export default [
         name: "freightRate",
         label: "运费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "freight",
@@ -156,7 +153,6 @@ export default [
         name: "premiumRate",
         label: "保费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "premium",
@@ -168,7 +164,6 @@ export default [
         name: "extrasRate",
         label: "杂费费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "extras",
@@ -207,7 +202,6 @@ export default [
         name: "serviceExchangeRate",
         label: "费率(%)",
         type: "num",
-        ratio:true,
       },
       {
         name: "serviceCurrency",
@@ -242,13 +236,6 @@ export default [
         label: "币别",
         selectapi: "currencyName",
         disabled: true,
-      },
-      {
-        name: "buyerRate",
-        label: "买方汇率",
-        type: "num",
-        decimal:6,
-        disabled: true
       },
       {
         name: "buyerPrice",

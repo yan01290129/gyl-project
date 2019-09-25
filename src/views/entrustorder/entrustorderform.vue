@@ -471,6 +471,11 @@
 					this.childType = 'add'
 					this.childwriteback= true
 					this.goodsformDialog.data = {}
+					//	卖方买方服务费币别费率
+					this.goodsformDialog.data.sellerCurrency = this.data.supplierCurrency
+					this.goodsformDialog.data.buyerCurrency = this.data.currency
+					this.goodsformDialog.data.serviceCurrency = this.standardcurrency
+					this.goodsformDialog.data.serviceExchangeRate = this.data.serviceTaxRate
 					//海关汇率
 					await this.gethgtimeExchangerate()
 					// 货款汇率 = 订单汇率 / 买方汇率
@@ -654,7 +659,13 @@
 			// 商品自动计算
 			autoCalculation(data){
 				data = {...this.data,...data}
-				let ratio = ['serviceTaxRate','freightRate','premiumRate','extrasRate','customTaxRate','increaseTaxRate','exciseTaxRate','otherTaxRate','serviceExchangeRate','drawbackRate']
+				// 增值税处理
+				if(data.vatTaxRate == '1')data.vatTaxRate = 13
+				if(data.vatTaxRate == '2')data.vatTaxRate = 9
+				if(data.vatTaxRate == '3')data.vatTaxRate = 16
+				if(data.vatTaxRate == '4')data.vatTaxRate = 10
+				if(data.vatTaxRate == '5')data.vatTaxRate = 0
+				let ratio = ['serviceTaxRate','freightRate','premiumRate','extrasRate','customTaxRate','increaseTaxRate','exciseTaxRate','vatTaxRate','otherTaxRate','serviceExchangeRate','drawbackRate']
 				let caleData = utils.getCalcConfig(data, this.goodsConfigsFormfile, this.formulalist, ratio)
 				for (let key in caleData) {
 					this.$set(this.goodsformDialog.data, key, caleData[key])
@@ -1047,7 +1058,6 @@
 				if (newVal) {
 					// 录入
 					try {
-						debugger
 						const { list } = await api.getList("materielbase", {specificationType: newVal});
 						if (list.length > 0) {
 							// 录入

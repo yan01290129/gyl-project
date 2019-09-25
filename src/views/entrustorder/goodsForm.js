@@ -11,13 +11,11 @@ export default [
         name: "orderModel",
         type: "inputbutton",
         label: "来货编码",
-        // readonly: true,
       },
       {
         name: "arrivalGoodsModel",
         type: "inputbutton",
         label: "来货规格型号",
-        // readonly: true,
         rules
       },
       {
@@ -248,7 +246,7 @@ export default [
         disabled: true,
       },
       {
-        name: "exciseTaxRate",
+        name: "vatTaxRate",
         type: "select",
         label: "进口增值税率",
         selectapi: "valueAddedTax",
@@ -299,7 +297,7 @@ export default [
         name: "serviceExchangeRate",
         label: "费率(%)",
         type: "num",
-        ratio:true,
+        disabled: true
       },
       {
         name: "serviceCurrency",
@@ -335,13 +333,13 @@ export default [
         selectapi: "currencyName",
         disabled: true,
       },
-      {
-        name: "buyerRate",
-        label: "买方汇率",
-        type: "num",
-        decimal:6,
-        disabled: true
-      },
+      // {
+      //   name: "buyerRate",
+      //   label: "买方汇率",
+      //   type: "num",
+      //   decimal:6,
+      //   disabled: true
+      // },
       {
         name: "buyerPrice",
         label: "单价",

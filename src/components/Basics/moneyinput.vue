@@ -33,7 +33,7 @@ export default {
     },
     symbol: {
       type: String,
-      default: "￥",
+      default: "$",
       desc: "货币标识符"
     },
   },

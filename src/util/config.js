@@ -197,15 +197,18 @@ export default {
    * @param {名称} 计算解析
    */
   calcConfig(data, calc,ratio, item) {
-    let symbol = ["+", "-", "*", "/", "(", ")",'1','2','3','4','5','6','7','8','9','0'];
-    var calclist = [calc];
-    for (let o = 0; o < symbol.length; o++) {
-      var val = [];
-      for (let i = 0; i < calclist.length; i++) {
-        let z = calclist[i].split(symbol[o]);
-        val.push(...z);
+    //  正则解析方式
+    var reg = /\+|\-|\*|\/|\(|\)/g; // 计算符
+    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+    var calclist = [];
+    var param = calc.split(reg);   // 按照计算符号分割
+    for (let h = 0; h < param.length; h++) {
+      if(param[h]){
+        if(!regPos.test(param[h]) || regNeg.test(param[h])) {
+          calclist.push(param[h]); // 去除非数值的类容
+        }
       }
-      calclist = val;
     }
     for (let f = 0; f < calclist.length; f++) {
       var key = calclist[f];
@@ -219,9 +222,10 @@ export default {
       }else{
         calc = calc.replace(key, 0)
         // 这里有个除以0的特殊情况
-        calc.replace('/0', '/1');
+        calc = calc.replace('/0', '/1');
       }
     }
+    console.log('解析：',calc)
     return parseFloat(eval(calc).toFixed(item.decimal || 4))
   },
 
@@ -235,12 +239,9 @@ export default {
         for (let item of config.items) {
           let key = formulaItem.formula.split('=')[0].replace(/\s/g, '')
           let calc = formulaItem.formula.split('=')[1].replace(/\s/g, '')
-          if(item.name == key && this.calcConfig(data,calc,ratio,item)){
-            let data = this.calcConfig(data,calc,ratio,item)
-            if(data){
-              // console.log(key,calc,caleData[key])
-              caleData[key] = this.calcConfig(data,calc,ratio,item)
-            }
+          if(item.name == key){
+            caleData[key] = this.calcConfig(data,calc,ratio,item)
+            console.log('计算：',key,'公式：',calc,'结果：',caleData[key])
           }
         }
       }
