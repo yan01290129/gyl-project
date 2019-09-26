@@ -1,5 +1,5 @@
 <template>
-  <div v-loading='loading' class="table">
+  <div class="table">
     <div class="operationDiv" v-if="operationConfigs.length">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>
@@ -37,11 +37,6 @@
 <script>
 	export default {
 		props: {
-			loading: {
-				type: Boolean,
-				default: false,
-				desc: '加载'
-			},
 			data: {
 				type: Array,
 				default: [],

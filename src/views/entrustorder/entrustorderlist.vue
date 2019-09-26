@@ -4,7 +4,7 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item><a href="#/entrustorderlist">委托订单</a></el-breadcrumb-item>
     </el-breadcrumb>
-    <data-table :loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerRuleChange='ruleChange' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='cellDblclick' @handlerOperation='operation'>
+    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerRuleChange='ruleChange' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='cellDblclick' @handlerOperation='operation'>
       <template #entrustOrderNo="slotProps">
         <el-tag type="success">{{slotProps.prop.entrustOrderNo}}</el-tag>
       </template>
