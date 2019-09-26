@@ -319,6 +319,12 @@ const TABLE_CONFIGS = {
     ruleConfigs: arrivalcountryRuleConfigs,
     configs: arrivalcountry
   },
+  settlementUnitName: {
+    title: "公司列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: companyinfoRuleConfigs,
+    configs: companyinfo
+  },
   
 };
 
@@ -439,6 +445,10 @@ const TABLE_WRITE = {
   arrivalCountryName: {
     arrivalCountry: "arrivalCountryCode",
     arrivalCountryName: "arrivalCountryName"
+  },
+  settlementUnitName: {
+    settlementUnit: "companyCode",
+    settlementUnitName: "companyName"
   },
 
 };
