@@ -165,14 +165,16 @@ export default [
         type: "select",
         label: "付供应商货款方式",
         selectapi: "paymentToSuppliers",
-        long: true
+        long: true,
+        rules
       },
       {
         name: "pickUpType",
         type: "select",
         label: "提货信息",
         selectapi: "pickingInformation",
-        long: true
+        long: true,
+        rules
       },
       // {
       //   name: "specialTips",

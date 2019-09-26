@@ -32,6 +32,9 @@ import supervisioncondition from "../supervisioncondition/table";
 import supervisionconditionRuleConfigs from "../supervisioncondition/rule";
 import taxcategory from "../taxcategory/table";
 import taxcategoryRuleConfigs from "../taxcategory/rule";
+import arrivalcountry from "../arrivalcountry/table";
+import arrivalcountryRuleConfigs from "../arrivalcountry/rule";
+
 
 
 const TABLE_lIMIT = {
@@ -51,6 +54,22 @@ const TABLE_lIMIT = {
     must: "agreementCode",
     news: "协议管理不能为空"
   },
+  receiveUnitName: {
+    must: "receiveUnitType",
+    news: "收货单位类型不能为空"
+  },
+  sellerName: {
+    must: "sellerType",
+    news: "报关卖方类型不能为空"
+  },
+  sendUnitName: {
+    must: "sendUnitType",
+    news: "发货单位类型不能为空"
+  },
+  customsContractBuyerName: {
+    must: "customsBuyerType",
+    news: "报关买方类型不能为空"
+  },
 };
 
 const TABLE_RULE = {
@@ -65,7 +84,118 @@ const TABLE_RULE = {
   },
   agreementSolutionName: {
     agreementNo: "agreementCode",
-  }
+  },
+};
+
+const TABLE_UPPER = {
+  receiveUnitName: {
+    judge: "receiveUnitType",
+    choice: {
+      '1': 'declarationUnitName',
+      '2': 'clientName',
+      '3': 'customerName',
+      '4': 'supplierName',
+    },
+    value:{
+      '1': {
+        receiveUnitCode: "companyCode",
+        receiveUnitName: "companyName"
+      },
+      '2': {
+        receiveUnitCode: "clientNo",
+        receiveUnitName: "clientName",
+      },
+      '3': {
+        receiveUnitCode: "customerNo",
+        receiveUnitName: "customerName",
+      },
+      '4': {
+        receiveUnitCode: "supplierCode",
+        receiveUnitName: "supplierName",
+      },
+    }
+  },
+  sellerName: {
+    judge: "sellerType",
+    choice: {
+      '1': 'declarationUnitName',
+      '2': 'clientName',
+      '3': 'customerName',
+      '4': 'supplierName',
+    },
+    value:{
+      '1': {
+        sellerCode: "companyCode",
+        sellerName: "companyName"
+      },
+      '2': {
+        sellerCode: "clientNo",
+        sellerName: "clientName",
+      },
+      '3': {
+        sellerCode: "customerNo",
+        sellerName: "customerName",
+      },
+      '4': {
+        sellerCode: "supplierCode",
+        sellerName: "supplierName",
+      },
+    }
+  },
+  sendUnitName: {
+    judge: "sendUnitType",
+    choice: {
+      '1': 'declarationUnitName',
+      '2': 'clientName',
+      '3': 'customerName',
+      '4': 'supplierName',
+    },
+    value:{
+      '1': {
+        sendUnit: "companyCode",
+        sendUnitName: "companyName"
+      },
+      '2': {
+        sendUnit: "clientNo",
+        sendUnitName: "clientName",
+      },
+      '3': {
+        sendUnit: "customerNo",
+        sendUnitName: "customerName",
+      },
+      '4': {
+        sendUnit: "supplierCode",
+        sendUnitName: "supplierName",
+      },
+    }
+  },
+  customsContractBuyerName: {
+    judge: "customsBuyerType",
+    choice: {
+      '1': 'declarationUnitName',
+      '2': 'clientName',
+      '3': 'customerName',
+      '4': 'supplierName',
+    },
+    value:{
+      '1': {
+        customsContractBuyer: "companyCode",
+        customsContractBuyerName: "companyName"
+      },
+      '2': {
+        customsContractBuyer: "clientNo",
+        customsContractBuyerName: "clientName",
+      },
+      '3': {
+        customsContractBuyer: "customerNo",
+        customsContractBuyerName: "customerName",
+      },
+      '4': {
+        customsContractBuyer: "supplierCode",
+        customsContractBuyerName: "supplierName",
+      },
+    }
+  },
 };
 
 const TABLE_CONFIGS = {
@@ -171,6 +301,25 @@ const TABLE_CONFIGS = {
     ruleConfigs: taxcategoryRuleConfigs,
     configs: taxcategory
   },
+  businessUnitName: {
+    title: "公司列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: companyinfoRuleConfigs,
+    configs: companyinfo
+  },
+  declarationUnitName: {
+    title: "公司列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: companyinfoRuleConfigs,
+    configs: companyinfo
+  },
+  arrivalCountryName: {
+    title: "抵运国列表",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: arrivalcountryRuleConfigs,
+    configs: arrivalcountry
+  },
+  
 };
 
 const TABLE_WRITE = {
@@ -279,6 +428,18 @@ const TABLE_WRITE = {
     taxTypeName: "taxCategoryName",
     otherTaxRate: "tax",
   },
+  businessUnitName: {
+    businessUnitCode: "companyCode",
+    businessUnitName: "companyName"
+  },
+  declarationUnitName: {
+    declarationUnitCode: "companyCode",
+    declarationUnitName: "companyName"
+  },
+  arrivalCountryName: {
+    arrivalCountry: "arrivalCountryCode",
+    arrivalCountryName: "arrivalCountryName"
+  },
 
 };
 
@@ -298,7 +459,11 @@ export default {
    * @param {名称} 点选数据
    */
   async getSelectionTable(data, item) {
-    var tableDialog = TABLE_CONFIGS[item.name];
+    if (TABLE_UPPER[item.name]) {
+      var tableDialog = TABLE_CONFIGS[TABLE_UPPER[item.name]["choice"][data[TABLE_UPPER[item.name]["judge"]]]];
+    } else {
+      var tableDialog = TABLE_CONFIGS[item.name];
+    }
     for (let key in TABLE_RULE[item.name]) {
       if (data.hasOwnProperty(TABLE_RULE[item.name][key])) {
         tableDialog.ruleData[key] = data[TABLE_RULE[item.name][key]];
@@ -339,9 +504,13 @@ export default {
   /**
    * @param {名称} 点选回写
    */
-  async writeSelectionTable(item, currentRow) {
+  async writeSelectionTable(item, currentRow, data) {
+    if (TABLE_UPPER[item.name]) {
+      var tableRow = TABLE_UPPER[item.name]["value"][data[TABLE_UPPER[item.name]["judge"]]];
+    } else {
+      var tableRow = TABLE_WRITE[item.name];
+    }
     var writeVla = {};
-    var tableRow = TABLE_WRITE[item.name];
     for (let key in tableRow) {
       if (currentRow.hasOwnProperty(tableRow[key])) {
         writeVla[key] = currentRow[tableRow[key]];

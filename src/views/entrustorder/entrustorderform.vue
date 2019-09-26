@@ -578,7 +578,7 @@
 			},
 
 			// 点选
-			async childPointSelection(){
+			async childPointSelection(data, item){
 				var limit = dialogDataUtil.limitSelectionTable(data, item)
 				if(limit){
 					return this.$message({ message: limit, type: 'warning',center: true });
@@ -590,7 +590,6 @@
 				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
 				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
     			this.tableDialog.loading = false
-
 			},
 
 			// *********************************弹窗表单*****************************
@@ -710,7 +709,11 @@
 					if((!this.tableDialog.currentRow) || JSON.stringify(this.tableDialog.currentRow) == '{}'){
 						return this.$message({ message: '请选择数据', type: 'warning',center: true });
 					}
-					const writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow)
+					if(this.tableDialog.itemform){
+						var writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow,this[this.tableDialog.itemform].data)
+					}else{
+						var writeVla = await dialogDataUtil.writeSelectionTable(this.tableDialog.item, this.tableDialog.currentRow,this.data)
+					}
 					if(this.tableDialog.itemform){
 						this[this.tableDialog.itemform].data = {...this[this.tableDialog.itemform].data,...writeVla}
 					}else{
@@ -852,8 +855,11 @@
 					upobj.serviceExchangeRate = this.data.serviceTaxRate
 					upobj.buyerExchangeRate = parseFloat(parseFloat(this.data.orderExchangeRate / this.data.buyerExchangeRate).toFixed(6))
 					item = {...item,...upobj}
+					// 若是公式存在引用的先后顺序，这里需要循环公式每次更新 如：公式a+b=c,c+d=e,a,b变换单e的公式先执行，e不会触发更新，这里暂时不考虑
 					let caleData = this.autoCalculation(item,this.formulalist)
+					console.log(caleData)
 					item = {...item,...caleData}
+					console.log(item)
 					data.push(item)
 				}
 				try {
@@ -861,6 +867,8 @@
 					this.goodsAll.statisticsloading = true
 					await api.updEntrustorderGoodsReplaceData(this.data.entrustOrderNo,data)
 					this.childGetTableList('goods')
+					// 获取统计数据
+					this.childGetTableGoodAll()
 					this.$message({ message: '商品信息已重新计算！', type: 'success',center: true });
 				} catch (error) {
 					this.$message({ message: '更新商品信息失败！', type: 'warning',center: true });
@@ -1035,6 +1043,22 @@
 					}
 				},
 				deep: true
+			},
+
+			// *****************报关操作
+
+			// 收货单位类型
+			'custom.data.receiveUnitType'(newVal, oldVal){
+				if(this.status && (!oldVal))return // 回写
+				this.custom.data.receiveUnitCode = ''
+				this.custom.data.receiveUnitName = ''
+			},
+			
+			// 报关卖方类型
+			'custom.data.sellerType'(newVal, oldVal){
+				if(this.status && (!oldVal))return // 回写
+				this.custom.data.sellerCode = ''
+				this.custom.data.sellerName = ''
 			},
 
 			// **************商品操作
