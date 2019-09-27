@@ -11,7 +11,7 @@
         <data-table v-loading='goods.loading' :data.sync="goods.data" :count.sync="goods.count" :configs.sync="goods.configs" :ruleData.sync="goods.ruleData" :noneRules='true' :operationConfigs='goods.optionConfigs' @handlerRuleChange='childRuleChange' @handlerCurrentSelected='childCurrentSelected' @handlerOperation='childOperationGood'></data-table>
       </el-tab-pane>
       <el-tab-pane label="报关信息" name="custom" v-if="data.entrustOrderType == '1' || data.entrustOrderType == '2'">
-        <data-form v-loading='custom.loading' :data.sync="custom.data" :configs="customConfigsFormfile" :operationConfigs='custom.optionConfigs' @handlerOperation='childFormOperation' @handlerPointSelection='childPointSelection'></data-form>
+        <data-form ref="customform" v-loading='custom.loading' :data.sync="custom.data" :configs="customConfigsFormfile" :operationConfigs='custom.optionConfigs' @handlerOperation='childFormOperation' @handlerPointSelection='childPointSelection'></data-form>
       </el-tab-pane>
       <el-tab-pane label="买方接货信息" name="buyer">
         <data-table v-loading='buyer.loading' :data.sync="buyer.data" :count.sync="buyer.count" :configs.sync="buyer.configs" :ruleData.sync="buyer.ruleData" :noneRules='true' :operationConfigs='buyer.optionConfigs' @handlerRuleChange='childRuleChange'></data-table>
@@ -505,7 +505,44 @@
 						this.childGetTableList('goods')
 						this.childGetTableGoodAll()
 					} catch (error) {
-						this.$message({ message: '获取数据失败', type: 'warning',center: true });
+						this.$message({ message: '删除失败', type: 'warning',center: true });
+						return Promise.reject(error)
+					} finally {
+						this.custom.loading = false
+					}
+					
+
+				}
+			},
+
+			// 受托方付款操作按钮事件
+			async childOperationTrusteepanyment(val){
+				if(val == 'add'){
+					this.childType = 'add'
+					this.trusteepanymentformDialog.data = {}
+					this.trusteepanymentformDialog.data.entrustOrderNo = this.data.entrustOrderNo
+					this.trusteepanymentformDialog.visible = true
+				}
+				if(val == 'upd'){
+					if(!this.trusteepanyment.currentRow){
+						return this.$message({ message: '请选择记录', type: 'warning',center: true });
+					}
+					this.childType = 'upd'
+					this.trusteepanymentformDialog.data = this.trusteepanyment.currentRow
+					this.trusteepanymentformDialog.visible = true
+				}
+				if(val == 'del'){
+					if(!this.trusteepanyment.currentRow){
+						return this.$message({ message: '请选择记录', type: 'warning',center: true });
+					}
+					try {
+						this.trusteepanyment.loading = true
+						const data = api.delEntrustorderTrusteepanymentData(this.trusteepanyment.currentRow.itemCode)
+						this.$message({ message: '删除成功', type: 'success',center: true });
+						this.trusteepanyment.loading = false
+						this.childGetTableList('trusteepanyment')
+					} catch (error) {
+						this.$message({ message: '删除失败', type: 'warning',center: true });
 						return Promise.reject(error)
 					} finally {
 						this.custom.loading = false
@@ -524,22 +561,6 @@
 				this.$set(this.goodsformDialog.data,'customsExchangeRate',val)
 				if(!val){
 					this.$message({ message: '获取海关汇率失效', type: 'warning',center: true });	
-				}
-			},
-
-			// 受托方付款操作按钮事件
-			async childOperationTrusteepanyment(val){
-				if(val == 'add'){
-					this.trusteepanymentformDialog.visible = true
-				}
-				if(val == 'upd'){
-					if(!this.trusteepanyment.currentRow){
-						return this.$message({ message: '请选择记录', type: 'warning',center: true });
-					}
-					this.trusteepanymentformDialog.data = this.trusteepanyment.currentRow
-					this.trusteepanymentformDialog.visible = true
-				}
-				if(val == 'del'){
 				}
 			},
 
@@ -571,8 +592,23 @@
 
 			// 操作按钮事件
 			childFormOperation(val){
-				if(val == 'save'){
-				}
+				this.$refs['customform'].$refs['form'].validate(async (valid) => {
+					if (valid) {
+						try {
+							this.custom.loading = true
+							const data = api.saveEntrustorderCustomData(this.custom.data)
+							this.$message({ message: '保存成功', type: 'success',center: true });
+							this.goods.loading = false
+							this.childGetTableList('goods')
+							this.childGetTableGoodAll()
+						} catch (error) {
+							this.$message({ message: '保存失败', type: 'warning',center: true });
+							return Promise.reject(error)
+						} finally {
+							this.custom.loading = false
+						}
+					}
+				});
 			},
 
 			// 点选
@@ -613,7 +649,7 @@
 					this.$refs['goodsform'].$refs['formDialog'].$refs['form'].validate(async (valid) => {
 						if (valid) {
 							try {
-								this.loading = true
+								this.goodsformDialog.visible = true
 								const data = this.childType == 'upd' ? await api.editEntrustorderGoodsData(this.goodsformDialog.data) : await api.addEntrustorderGoodsData(this.goodsformDialog.data)
 								this.$message({ message: '保存成功', type: 'success',center: true });
 								this.goodsformDialog.visible = false
@@ -638,6 +674,24 @@
 					this.trusteepanymentformDialog.visible = false
 				}
 				if(val == 'confirm'){
+					this.$refs['trusteepanymentform'].$refs['formDialog'].$refs['form'].validate(async (valid) => {
+						if (valid) {
+							try {
+								this.trusteepanymentformDialog.visible = true
+								const data = this.childType == 'upd' ? await api.editEntrustorderTrusteepanymentData(this.trusteepanymentformDialog.data) : await api.addEntrustorderTrusteepanymentData(this.trusteepanymentformDialog.data)
+								this.$message({ message: '保存成功', type: 'success',center: true });
+								this.trusteepanymentformDialog.visible = false
+								this.childGetTableList('trusteepanyment')
+							} catch (error) {
+								this.$message({ message: '保存失败', type: 'warning',center: true });
+								return Promise.reject(error)
+							} finally {
+								this.loading = false
+							}
+						} else {
+							return false;
+						}
+					});
 				}
 			},
 			
@@ -878,9 +932,9 @@
 					this.childGetTableList('goods')
 					// 获取统计数据
 					this.childGetTableGoodAll()
-					this.$message({ message: '商品信息已重新计算！', type: 'success',center: true });
+					this.$message({ message: '商品信息已重新计算', type: 'success',center: true });
 				} catch (error) {
-					this.$message({ message: '更新商品信息失败！', type: 'warning',center: true });
+					this.$message({ message: '更新商品信息失败', type: 'warning',center: true });
 					return Promise.reject(error)
 				} finally {
 					this.goods.loading = false

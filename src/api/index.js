@@ -121,4 +121,39 @@ export default {
     });
   },
 
+  // 委托订单 报表 保存
+  saveEntrustorderCustomData(data) {
+    return request({
+      url: '/entrustcustom/',
+      method: "POST",
+      data
+    });
+  },
+
+  // 委托订单 受托方付款 新增
+  addEntrustorderTrusteepanymentData(data) {
+    return request({
+      url: '/entrusttrusteepanyment/',
+      method: "POST",
+      data
+    });
+  },
+
+  // 委托订单 受托方付款 修改
+  editEntrustorderTrusteepanymentData(data) {
+    return request({
+      url: '/entrusttrusteepanyment/',
+      method: "PUT",
+      data
+    });
+  },
+
+  // 委托订单 受托方付款 删除
+  delEntrustorderTrusteepanymentData(code, data) {
+    return request({
+      url: `/entrusttrusteepanyment/${code}`,
+      method: "DELETE"
+    });
+  },
+
 };
