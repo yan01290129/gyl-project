@@ -4,7 +4,7 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item><a href="#/entrustorderlist">委托订单</a></el-breadcrumb-item>
     </el-breadcrumb>
-    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerRuleChange='ruleChange' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='cellDblclick' @handlerOperation='operation'>
+    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='cellDblclick' @handlerRuleChange='ruleChange' @handlerRuleEvent='ruleEvent' @handlerOperation='operation'>
       <template #entrustOrderNo="slotProps">
         <el-tag type="success">{{slotProps.prop.entrustOrderNo}}</el-tag>
       </template>
@@ -62,6 +62,15 @@
 			cellDblclick(currentRow){
 				this.operation('upd')
 			},
+			// 查询条件变更
+			ruleEvent(newVal, oldVal){
+				if(oldVal && newVal.pageIndex === oldVal.pageIndex && newVal.pageIndex !== 1){
+					// 如果存在页码之外的条件变更，且不在第一页
+					this.$set(this.ruleData,'pageIndex',1)
+				}else{
+					this.getTableList()
+				}
+			},
 			// 操作按钮事件
 			async operation(val){
 				if(val == 'add'){
@@ -83,24 +92,12 @@
 						this.loading = false
 					}
 				}
-			}
-		},
-		watch:{
-			ruleData: {
-				handler(newVal, oldVal) {
-					if(newVal.pageIndex === oldVal.pageIndex && newVal.pageIndex !== 1){
-						// 如果存在页码之外的条件变更，且不在第一页
-						this.$set(this.ruleData,'pageIndex',1)
-					}else{
-						this.getTableList()
-					}
-				},
-				deep: true
 			},
 		},
 		created(){
-			// 初始化条件
+			// 初始化条件并查询
 			this.ruleData = utils.inntTable()
+			this.getTableList()
 		},
 	};
 </script>

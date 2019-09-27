@@ -43,7 +43,7 @@
     <data-table v-if="tabIsDisabled" v-loading='goodsAll.statisticsloading' :data.sync="goodsAll.statisticsData" :count="1" :ruleData={} :configs.sync="goodsAll.statisticsConfigs"></data-table>
     <data-form ref="othorform" v-if="tabIsDisabled" v-loading='loading' :data.sync="data" :configs.sync="configsOthor" @handlerPointSelection='pointSelection'></data-form>
     <!--弹窗--->
-    <data-table-dialog :loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
+    <data-table-dialog :loading='tableDialog.loading' :title.sync='tableDialog.title' :visible.sync='tableDialog.visible' :data.sync='tableDialog.data' :count.sync="tableDialog.count" :configs.sync="tableDialog.configs" :ruleData.sync="tableDialog.ruleData" :ruleConfigs.sync="tableDialog.ruleConfigs" :operationConfigs='tableDialog.optionConfigs' @handlerRuleChange='tableDialogRuleChange' @handlerRuleEvent='tableDialogRuleEvent' @handlerCurrentSelected='tableDialogcurrentSelected' @handlerOperation='tableDialogOperation'></data-table-dialog>
     <data-form-dialog ref="goodsform" :loading='goodsformDialog.loading' :title.sync='goodsformDialog.title' :visible.sync='goodsformDialog.visible' :data.sync='goodsformDialog.data' :configs='goodsConfigsFormfile' :operationConfigs.sync='goodsformDialog.optionConfigs' @handlerOperation='fromDialogOperationGood' @handlerPointSelection='fromDialogPointSelectionGoods'></data-form-dialog>
     <data-form-dialog ref="trusteepanymentform" :loading='trusteepanymentformDialog.loading' :title.sync='trusteepanymentformDialog.title' :visible.sync='trusteepanymentformDialog.visible' :data.sync='trusteepanymentformDialog.data' :configs.sync='trusteepanymentformDialog.configs' :operationConfigs.sync='trusteepanymentformDialog.optionConfigs' @handlerOperation='fromDialogOperationTrusteepanyment' @handlerPointSelection='fromDialogPointSelectionTrusteepanyment'></data-form-dialog>
   </div>
@@ -385,7 +385,7 @@
 
 			// 获取表单下拉
 			async loadConfigSelect(){
-				if(this.status == '2') return
+				// if(this.status == '2') return
 				this.loading = true
 				this.configs = [...await utils.setConfigFormSelect(this.configs)]
 				this.configsOthor = [...await utils.setConfigFormSelect(this.configsOthor)]
@@ -430,13 +430,11 @@
 				if(limit){
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
-				this.tableDialog.item = item
 				this.tableDialog.itemform = ''
+				this.tableDialog.item = item
 				this.tableDialog.visible = true
-    			this.tableDialog.loading = true
-				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
-				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
-    			this.tableDialog.loading = false
+				// 使用 await element dialog加载好了再修改条件 触发更新异步调用
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTableRule(data, item)}
 			},
 
 			// *********************************子表表格*****************************
@@ -583,13 +581,10 @@
 				if(limit){
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
-				this.tableDialog.item = item
 				this.tableDialog.itemform = 'custom'
+				this.tableDialog.item = item
 				this.tableDialog.visible = true
-    			this.tableDialog.loading = true
-				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
-				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
-    			this.tableDialog.loading = false
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTableRule(data, item)}
 			},
 
 			// *********************************弹窗表单*****************************
@@ -652,13 +647,10 @@
 				if(limit){
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
-				this.tableDialog.item = item
 				this.tableDialog.itemform = 'goodsformDialog'
+				this.tableDialog.item = item
 				this.tableDialog.visible = true
-    			this.tableDialog.loading = true
-				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
-				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
-    			this.tableDialog.loading = false
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTableRule(data, item)}
 			},
 			
 			// 点选
@@ -667,13 +659,10 @@
 				if(limit){
 					return this.$message({ message: limit, type: 'warning',center: true });
 				}
-				this.tableDialog.item = item
 				this.tableDialog.itemform = 'trusteepanymentformDialog'
+				this.tableDialog.item = item
 				this.tableDialog.visible = true
-    			this.tableDialog.loading = true
-				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTable(data, item)}
-				this.tableDialog.ruleData = {...this.tableDialog.ruleData}
-    			this.tableDialog.loading = false
+				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.getSelectionTableRule(data, item)}
 			},
 
 			// 商品自动计算
@@ -692,13 +681,33 @@
 
 			// *********************************弹窗表格*****************************
 
-			//且换搜索条件
+			// 更换搜索条件
 			async tableDialogRuleChange(val){
-				this.tableDialog.loading = true
 				this.tableDialog.ruleData = {...this.tableDialog.ruleData,...val}
-				this.tableDialog = {...this.tableDialog, ...await dialogDataUtil.changeSelectionTable(this.tableDialog.item, this.tableDialog.ruleData)}
-				this.tableDialog.loading = false
 			},
+
+			//  更换条件查询
+			async tableDialogRuleEvent(newVal, oldVal) {
+				if(oldVal && newVal.pageIndex === oldVal.pageIndex && newVal.pageIndex !== 1){
+					// 如果存在页码之外的条件变更，且不在第一页
+					this.$set(this.tableDialog.ruleData,'pageIndex',1)
+				}else{
+					try {
+    					this.tableDialog.loading = true
+						const { list, count } = await api.getList(
+							this.tableDialog.configs["api"],
+							this.tableDialog.ruleData
+						);
+						this.tableDialog.data = list
+						this.tableDialog.count = count
+					} catch (error) {
+						return Promise.reject(error);
+					}finally{
+						this.tableDialog.loading = false
+					}
+				}
+			},
+
 			// 选中行
 			tableDialogcurrentSelected(currentRow){
 				this.tableDialog.currentRow = currentRow
@@ -857,9 +866,9 @@
 					item = {...item,...upobj}
 					// 若是公式存在引用的先后顺序，这里需要循环公式每次更新 如：公式a+b=c,c+d=e,a,b变换单e的公式先执行，e不会触发更新，这里暂时不考虑
 					let caleData = this.autoCalculation(item,this.formulalist)
-					console.log(caleData)
+					// console.log(caleData)
 					item = {...item,...caleData}
-					console.log(item)
+					// console.log(item)
 					data.push(item)
 				}
 				try {
@@ -1172,7 +1181,7 @@
 							return
 						}
 					} catch (e) {
-						console.log(e);
+      					return Promise.reject(error);
 					}
 				}
 				// 清除

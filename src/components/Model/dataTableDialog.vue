@@ -1,6 +1,6 @@
 <template>
   <el-dialog class="tableDialog" :close-on-click-modal="false" :title="title" :visible="visible" :before-close="handleClose">
-    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData"  :ruleConfigs.sync="ruleConfigs" @handlerRuleChange='ruleChange' @handlerCurrentSelected='currentSelected' @handlerOperation='operation'></data-table>
+    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData"  :ruleConfigs.sync="ruleConfigs" @handlerRuleChange='ruleChange' @handlerCurrentSelected='currentSelected' @handlerOperation='operation' @handlerRuleEvent='ruleEvent'></data-table>
 	<div class="operationDialogDiv">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>
@@ -71,7 +71,10 @@
 			},
 			handleClose() {
 				this.$emit("update:visible", false);
-			}
+			},
+			ruleEvent(newVal, oldVal) {
+				this.$emit("handlerRuleEvent", newVal, oldVal);
+			},
 		}
 	};
 </script>

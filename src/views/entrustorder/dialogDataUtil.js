@@ -464,6 +464,41 @@ export default {
       return "";
     }
   },
+  
+  /**
+  * @param {名称} 点选配置条件
+  */
+  getSelectionTableRule(data, item) {
+    if (TABLE_UPPER[item.name]) {
+      var tableDialog = TABLE_CONFIGS[TABLE_UPPER[item.name]["choice"][data[TABLE_UPPER[item.name]["judge"]]]];
+    } else {
+      var tableDialog = TABLE_CONFIGS[item.name];
+    }
+    for (let key in TABLE_RULE[item.name]) {
+      if (data.hasOwnProperty(TABLE_RULE[item.name][key])) {
+        tableDialog.ruleData[key] = data[TABLE_RULE[item.name][key]];
+      } else {
+        tableDialog.ruleData[key] = "";
+      }
+    }
+    return tableDialog
+  },
+
+  /**
+    * @param {名称} 点选列表
+    */
+   async getSelectionTableList(tableDialog) {
+    try {
+      const { list, count } = await api.getList(
+        tableDialog.configs["api"],
+        tableDialog.ruleData
+      );
+      (tableDialog.data = list), (tableDialog.count = count);
+        return tableDialog;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+  },
 
   /**
    * @param {名称} 点选数据

@@ -89,7 +89,16 @@
 			operation(val) {
 				this.$emit("handlerOperation", val);
 			},
-		}
+		},
+		watch:{
+			ruleData: {
+				handler(newVal, oldVal) {
+					this.$emit("handlerRuleEvent", newVal, oldVal);
+				},
+				deep: true,
+				// immediate:true
+			},
+		},
 	};
 </script>
 

@@ -65,7 +65,7 @@
                 <template v-else>
                   <el-form-item :key="e" v-show="item.disab !== true" class='form-item text' :label="item.label" :class='item.big?"form-item-big":item.long?"form-item-long":""'>
                     <label class="colon">:</label>
-                    <i v-if='item.type == "input" || item.type == "num" || item.type == "inputbutton" || item.type == "textarea"'>{{data[item.name] || '*'}}</i>
+                    <i v-if='item.type == "input" || item.type == "num" || item.type == "inputbutton" || item.type == "numbutton" || item.type == "textarea"'>{{data[item.name] || '*'}}</i>
                     <i v-if='item.type == "date"'><i class="el-icon-time"></i>{{data[item.name] || '*'}}</i>
                     <i v-if='item.type == "select" || item.type == "radio"'>{{(data[item.name] && item['options'][data[item.name]])?item['options'][data[item.name]]["label"]:'*'}}</i>
                     <i v-if='item.type == "switch"'>{{data[item.name]===true?'是':data[item.name]===false?'否':'*'}}</i>
@@ -80,11 +80,11 @@
                       </template>
                       <span v-else>*</span>
                     </i>
-                    <i v-if='item.type == "inputselect" || item.type == "numselect"'>{{data[item.selsect] || '*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}</i>
+                    <i v-if='item.type == "inputselect" || item.type == "numselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}</i>
                     <i v-if='item.type == "money"'>{{data[item.name]?(item['symbol'] || '$'):'*'}}{{data[item.name]}}</i>
-                    <i v-if='item.type == "moneyselect"'>{{data[item.selsect] || '*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]?(item['symbol'] || '$'):'*'}}{{data[item.name]}}</i>
+                    <i v-if='item.type == "moneyselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]?(item['symbol'] || '$'):'*'}}{{data[item.name]}}</i>
                     <i v-if='item.type == "percent"'>{{data[item.name]}}{{data[item.name]?'%':'*'}}</i>
-                    <i v-if='item.type == "percentselect"'>{{data[item.selsect] || '*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}{{data[item.name]?'%':'*'}}</i>
+                    <i v-if='item.type == "percentselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}{{data[item.name]?'%':'*'}}</i>
                   </el-form-item>
                 </template>
               </template>
