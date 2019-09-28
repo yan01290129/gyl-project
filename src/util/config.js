@@ -58,8 +58,14 @@ export default {
   async setConfigFormSelect(configs) {
     for await (let config of configs) {
       let requestArr = [];
-      for (let item of config.items) {
-        item.selectapi && requestArr.push(item.selectapi);
+      if(config.items){
+        for (let item of config.items) {
+          item.selectapi && requestArr.push(item.selectapi);
+        }
+      }else{
+        for (let item of config) {
+          item.selectapi && requestArr.push(item.selectapi);
+        }
       }
       try {
         const [...response] = await Promise.all(

@@ -93,6 +93,12 @@
 					}
 				}
 			},
+			// 获取搜索栏下拉
+			async loadConfigSelect(){
+				this.loading = true
+				this.configs = [...await utils.setConfigFormSelect(this.ruleConfigs)]
+				this.loading = false
+			},
 		},
 		created(){
 			// 初始化条件并查询

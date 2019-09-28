@@ -5,7 +5,7 @@
     </div>
     <div v-if='noneRules !== true'>
       <el-form :model="ruleData" label-position="left" size="small" label-width="120px">
-        <el-form-item v-for="(item,index) in ruleConfigs" :key="index" :label="item.label" class='form-item'>
+        <el-form-item v-for="(item,index) in ruleConfigs" :key="index" :label="item.label" class='form-item' style="margin-right: 20px;">
           <!-- 输入框 -->
           <el-input v-if='item.type == "input"' v-model.trim="ruleData[item.name]" :placeholder="item.placeholder || '请输入搜索内容'" clearable></el-input>
           <!-- 日期框 -->
@@ -39,7 +39,7 @@
 		props: {
 			data: {
 				type: Array,
-				default: [],
+				default: () => [],
 				desc: "表格值"
 			},
 			count: {
