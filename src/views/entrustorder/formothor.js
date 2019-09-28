@@ -28,7 +28,7 @@ export default [
         label: "卖方销售总货值",
         type: "moneyselect",
         disabled: true,
-        selsect:'supplierCurrency',
+        selsect:'sellerCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -40,7 +40,7 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        selsect:'customTotalAmountcurrency',
+        selsect:'customCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -52,7 +52,7 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        selsect:'vatTotalAmountcurrency',
+        selsect:'vatCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -64,7 +64,7 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        selsect:'totalServiceChargecurrency',
+        selsect:'serviceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -81,7 +81,7 @@ export default [
         label: "受托方应付货款总额",
         type: "moneyselect",
         disabled: true,
-        selsect:'totalServiceChargecurrency',
+        selsect:'trusteeCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -93,7 +93,7 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        selsect:'invoiceAmountcurrency',
+        selsect:'invoiceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -105,7 +105,7 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        selsect:'advanceActualAmountcurrency',
+        selsect:'advanceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -115,7 +115,7 @@ export default [
         label: "应退客户货款",
         type: "moneyselect",
         disabled: true,
-        selsect:'supplierCurrency',
+        selsect:'srefundCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true
@@ -125,7 +125,7 @@ export default [
         label: "已付货款总额",
         type: "moneyselect",
         disabled: true,
-        selsect:'supplierCurrency',
+        selsect:'paidCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
         long: true

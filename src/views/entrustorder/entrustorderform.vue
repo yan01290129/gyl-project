@@ -200,6 +200,7 @@
 			},
 			goodsAll:{
 				data:[],
+				countData:{},
 				// 展示数据
 				statisticsloading:false,
 				statisticsData:[],
@@ -794,8 +795,9 @@
 				try {
 					this.goods.loading = true
 					this.goodsAll.statisticsloading = true
-					const { list } = await utils.getConfigTable(this['goods'].configs.api, {entrustOrderNo:this.data.entrustOrderNo})
-					this.goodsAll.data = list
+					const data = await utils.getConfigTable(this['goods'].configs.api, {entrustOrderNo:this.data.entrustOrderNo})
+					this.goodsAll.data = data.list
+					this.goodsAll.countData = data
 				} catch (error) {
 					this.$message({ message: '获取数据失败', type: 'warning',center: true });
 					return Promise.reject(error)
@@ -851,11 +853,15 @@
 						this.$set(this.data, key, data[key])
 					}
 					// 默认本位币
-					this.$set(this.data, 'customTotalAmountcurrency', this.standardcurrency)
-					this.$set(this.data, 'vatTotalAmountcurrency', this.standardcurrency)
-					this.$set(this.data, 'totalServiceChargecurrency', this.standardcurrency)
-					this.$set(this.data, 'invoiceAmountcurrency', this.standardcurrency)
-					this.$set(this.data, 'advanceActualAmountcurrency', this.standardcurrency)
+					this.$set(this.data, 'sellerCurrency', this.data.supplierCurrency)
+					this.$set(this.data, 'customCurrency', this.standardcurrency)
+					this.$set(this.data, 'vatCurrency', this.standardcurrency)
+					this.$set(this.data, 'serviceCurrency', this.standardcurrency)
+					this.$set(this.data, 'trusteeCurrency', this.standardcurrency)
+					this.$set(this.data, 'invoiceCurrency', this.standardcurrency)
+					this.$set(this.data, 'advanceCurrency', this.standardcurrency)
+					this.$set(this.data, 'srefundCurrency', this.data.supplierCurrency)
+					this.$set(this.data, 'paidCurrency', this.data.supplierCurrency)
 					// 低消差额 最低消费额 - 服务费总和
 					this.$set(this.data, 'minimumCharge', this.data.minCharge - this.data.totalServiceCharge)
 					this.statisticsOther()
