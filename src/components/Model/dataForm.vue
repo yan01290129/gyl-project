@@ -13,7 +13,7 @@
               <template v-if="item.none !== true">
                 <template v-if="config.text !== true">
                   <!---rules没有时选取null，解决数字框校验‘is not string’---->
-                  <el-form-item :key="e" v-show="item.disab !== true" :prop="item.name" :rules="item.disabled !== true ? item.rules : null" class='form-item' :label="item.label" :class='item.big?"form-item-big":item.long?"form-item-long":""'>
+                  <el-form-item :key="e" v-show="item.disab !== true" :prop="item.name" :rules="item.disabled !== true ? item.rules : null" class='form-item' :label="item.label" :class='item.length == "long"?"form-item-long":item.length == "in"?"form-item-in":""'>
                     <!-- 输入框/点选框/下拉输入框 -->
                     <el-input v-if='item.type == "input" || item.type == "inputbutton" || item.type == "inputselect"' v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' @change='inputChange(data,item)' :placeholder="item.placeholder || '请输入内容'">
                       <el-button v-if="item.type == 'inputbutton' && item.disabled !== true" slot="append" icon="el-icon-search" @click="pointSelection(data,item)"></el-button>
@@ -60,10 +60,11 @@
                     </percent-input>
                     <!-- 文本域 -->
                     <el-input v-if='item.type == "textarea"' type="textarea" v-model.trim="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' :placeholder="item.placeholder || '请输入详细内容'"></el-input>
+                    <el-button v-if='item.type == "button"' :icon="item.icon"  @click="buttonClick(data,item)">{{item.text}}</el-button>
                   </el-form-item>
                 </template>
                 <template v-else>
-                  <el-form-item :key="e" v-show="item.disab !== true" class='form-item text' :label="item.label" :class='item.big?"form-item-big":item.long?"form-item-long":""'>
+                  <el-form-item :key="e" v-show="item.disab !== true" class='form-item text' :label="item.label" :class='item.length == "long"?"form-item-long":item.length == "in"?"form-item-in":""'>
                     <label class="colon">:</label>
                     <i v-if='item.type == "input" || item.type == "num" || item.type == "inputbutton" || item.type == "numbutton" || item.type == "textarea"'>{{data[item.name] || '*'}}</i>
                     <i v-if='item.type == "date"'><i class="el-icon-time"></i>{{data[item.name] || '*'}}</i>
@@ -141,6 +142,9 @@ export default {
     },
     dateChange(data, item) {
       this.$emit("handlerDateChange", data, item);
+    },
+    buttonClick(data, item) {
+      this.$emit("handlerButtonClick", data, item);
     },
 		operation(val) {
 			this.$emit("handlerOperation", val);

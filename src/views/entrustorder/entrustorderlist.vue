@@ -36,6 +36,12 @@
 			currentRow:''
 		}),
 		methods: {
+			// 获取搜索栏下拉
+			async loadConfigSelect(){
+				this.loading = true
+				this.ruleConfigs = await utils.setConfigTableRuleSelect(this.ruleConfigs)
+				this.loading = false
+			},
 			// 获取列表
 			async getTableList() {
 				try {
@@ -58,14 +64,13 @@
 			currentSelected(currentRow){
 				this.currentRow = currentRow
 			},
-			// 选中当前行
+			// 双击当前行
 			cellDblclick(currentRow){
 				this.operation('upd')
 			},
 			// 查询条件变更
 			ruleEvent(newVal, oldVal){
-				if(oldVal && newVal.pageIndex === oldVal.pageIndex && newVal.pageIndex !== 1){
-					// 如果存在页码之外的条件变更，且不在第一页
+				if(newVal.pageIndex === oldVal.pageIndex && newVal.pageIndex !== 1){	// 如果存在页码之外的条件变更，且不在第一页
 					this.$set(this.ruleData,'pageIndex',1)
 				}else{
 					this.getTableList()
@@ -93,16 +98,11 @@
 					}
 				}
 			},
-			// 获取搜索栏下拉
-			async loadConfigSelect(){
-				this.loading = true
-				this.configs = [...await utils.setConfigFormSelect(this.ruleConfigs)]
-				this.loading = false
-			},
 		},
 		created(){
-			// 初始化条件并查询
+			// 初始化
 			this.ruleData = utils.inntTable()
+			this.loadConfigSelect()
 			this.getTableList()
 		},
 	};

@@ -13,7 +13,7 @@ export default [
         type: "money",
         decimal:2,
         symbol:'￥',
-        long: true
+        length:'in',
       },
       {
         name: "quarantineFee",
@@ -21,7 +21,7 @@ export default [
         type: "money",
         decimal:2,
         symbol:'￥',
-        long: true
+        length:'in',
       },
       {
         name: "goodsValue",
@@ -31,7 +31,7 @@ export default [
         selsect:'sellerCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "customTotalAmount",
@@ -43,7 +43,7 @@ export default [
         selsect:'customCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "vatTotalAmount",
@@ -55,7 +55,7 @@ export default [
         selsect:'vatCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "totalServiceCharge",
@@ -67,14 +67,14 @@ export default [
         selsect:'serviceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "matPayment",
         type: "switch",
         label: "是否垫货款",
         disabled: true,
-        long: true
+        length:'in',
       },
       {
         name: "trusteePayGoodsAmount",
@@ -84,7 +84,7 @@ export default [
         selsect:'trusteeCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "invoiceAmount",
@@ -96,7 +96,7 @@ export default [
         selsect:'invoiceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "advanceAmount",
@@ -108,7 +108,7 @@ export default [
         selsect:'advanceCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "refundCustomerAmount",
@@ -118,7 +118,7 @@ export default [
         selsect:'srefundCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "paidGoodsAmount",
@@ -128,28 +128,28 @@ export default [
         selsect:'paidCurrency',
         selectapi: "currencyName",
         selsectDisabled:true,
-        long: true
+        length:'in',
       },
       {
         name: "dayRate",
         label: "日利率(%)",
         type: "num",
         disabled: true,
-        long: true
+        length:'in',
       },
       {
         name: "chargeInterest",
         type: "switch",
         label: "计息",
         disabled: true,
-        long: true
+        length:'in',
       },
       {
         name: "invoiceType",
         type: "select",
         label: "发票类型",
         selectapi: "InvoiceTypes",
-        long: true
+        length:'in',
       },
       {
         name: "minimumCharge",
@@ -158,14 +158,14 @@ export default [
         decimal:2,
         symbol:'￥',
         disabled: true,
-        long: true
+        length:'in',
       },
       {
         name: "supplierPayMode",
         type: "select",
         label: "付供应商货款方式",
         selectapi: "paymentToSuppliers",
-        long: true,
+        length:'in',
         rules
       },
       {
@@ -173,7 +173,7 @@ export default [
         type: "select",
         label: "提货信息",
         selectapi: "pickingInformation",
-        long: true,
+        length:'in',
         rules
       },
       // {
@@ -185,13 +185,13 @@ export default [
         name: "invoiceRemark",
         type: "textarea",
         label: "发票备注",
-        long: true
+        length:'long',
       },
       {
         name: "remark",
         type: "textarea",
         label: "备注",
-        long: true
+        length:'long',
       },
     ]
   }

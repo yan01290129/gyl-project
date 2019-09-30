@@ -3,23 +3,21 @@
     <div class="operationDiv" v-if="operationConfigs.length">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>
-    <div v-if='noneRules !== true'>
-      <el-form :model="ruleData" label-position="left" size="small" label-width="120px">
-        <el-form-item v-for="(item,index) in ruleConfigs" :key="index" :label="item.label" class='form-item' style="margin-right: 20px;">
-          <!-- 输入框 -->
-          <el-input v-if='item.type == "input"' v-model.trim="ruleData[item.name]" :placeholder="item.placeholder || '请输入搜索内容'" clearable></el-input>
-          <!-- 日期框 -->
-          <el-date-picker v-if="item.type == 'date'" v-model="ruleData[item.name]" type="date" :placeholder="item.placeholder || '请选择日期'" value-format="yyyy-MM-dd">
-          </el-date-picker>
-          <!-- 下拉框 -->
-          <el-select v-if="item.type == 'select'" v-model="ruleData[item.name]" :placeholder="item.placeholder || '请现在筛选内容'">
-            <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
-          </el-select>
-          <!-- 布尔框 -->
-          <el-switch v-if="item.type=='switch'" v-model="data[item.name]"></el-switch>
-        </el-form-item>
-      </el-form>
-    </div>
+	<el-form v-if='noneRules !== true' :model="ruleData" label-position="left" size="small" label-width="120px">
+		<el-form-item v-for="(item,index) in ruleConfigs" :key="index" :label="item.label" class='form-item ruleItem'>
+			<!-- 输入框 -->
+			<el-input v-if='item.type == "input"' v-model.trim="ruleData[item.name]" :placeholder="item.placeholder || '请输入搜索内容'" clearable></el-input>
+			<!-- 日期框 -->
+			<el-date-picker v-if="item.type == 'date'" v-model="ruleData[item.name]" type="date" :placeholder="item.placeholder || '请选择日期'" value-format="yyyy-MM-dd">
+			</el-date-picker>
+			<!-- 下拉框 -->
+			<el-select v-if="item.type == 'select'" v-model="ruleData[item.name]" :placeholder="item.placeholder || '请现在筛选内容'">
+			<el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
+			</el-select>
+			<!-- 布尔框 -->
+			<el-switch v-if="item.type=='switch'" v-model="data[item.name]"></el-switch>
+		</el-form-item>
+	</el-form>
     <el-table ref="table" border :data="data" highlight-current-row @current-change="currentSelected" @cell-dblclick="cellDblclick" size="small">
       <el-table-column type="selection" width="50" v-if="configs.selection === true"></el-table-column>
       <template v-for="(item,index) in configs.items">

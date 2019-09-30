@@ -25,13 +25,14 @@ export default [
         label: "品牌",
         rules
       },
-      // {
-      //   type: 'button',
-      //   key: "brandNameorder",
-      //   name: "",
-      //   lable: "品牌记录",
-      //   prop: "brandNameorder",
-      // },
+      {
+        name: "brandNameorder",
+        type: "button",
+        label: "品牌记录",
+        icon: 'el-icon-search',
+        text:'点击查看品牌记录',
+        click:'brandNameorder'
+      },
       {
         name: "sourceAreaName",
         type: "inputbutton",
@@ -39,13 +40,14 @@ export default [
         readonly: true,
         rules
       },
-      // {
-      //   type: 'button',
-      //   key: "sourceAreaNameorder",
-      //   name: "",
-      //   lable: "产地记录",
-      //   prop: "sourceAreaNameorder",
-      // },
+      {
+        name: "sourceAreaNameorder",
+        type: "button",
+        label: "产地记录",
+        icon: 'el-icon-search',
+        text:'点击查看产地记录',
+        click:'sourceAreaNameorder'
+      },
       {
         name: "arrivalGoodsName",
         type: "input",

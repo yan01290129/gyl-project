@@ -34,6 +34,8 @@ import taxcategory from "../taxcategory/table";
 import taxcategoryRuleConfigs from "../taxcategory/rule";
 import arrivalcountry from "../arrivalcountry/table";
 import arrivalcountryRuleConfigs from "../arrivalcountry/rule";
+import materielorigin from "../materielorigin/table";
+import materieloriginRuleConfigs from "../materielorigin/rule";
 
 
 
@@ -70,6 +72,14 @@ const TABLE_lIMIT = {
     must: "customsBuyerType",
     news: "报关买方类型不能为空"
   },
+  brandNameorder: {
+    must: "arrivalGoodsModel",
+    news: "青选择你要查看的来货规格型号"
+  },
+  sourceAreaNameorder: {
+    must: "arrivalGoodsModel",
+    news: "青选择你要查看的来货规格型号"
+  },
 };
 
 const TABLE_RULE = {
@@ -84,6 +94,12 @@ const TABLE_RULE = {
   },
   agreementSolutionName: {
     agreementNo: "agreementCode",
+  },
+  brandNameorder: {
+    specificationType: "arrivalGoodsModel",
+  },
+  sourceAreaNameorder: {
+    specificationType: "arrivalGoodsModel",
   },
 };
 
@@ -325,7 +341,18 @@ const TABLE_CONFIGS = {
     ruleConfigs: companyinfoRuleConfigs,
     configs: companyinfo
   },
-  
+  brandNameorder: {
+    title: "品牌记录",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: materieloriginRuleConfigs,
+    configs: materielorigin
+  },
+  sourceAreaNameorder: {
+    title: "产地记录",
+    ruleData:{ ...utils.inntTable(), status: "2" },
+    ruleConfigs: materieloriginRuleConfigs,
+    configs: materielorigin
+  },
 };
 
 const TABLE_WRITE = {

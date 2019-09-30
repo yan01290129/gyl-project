@@ -10,6 +10,37 @@ export default {
   },
 
   /**
+   * @param {名称} 设置表格搜索下拉字典数据
+   */
+  async setConfigTableRuleSelect(configs) {
+    let requestArr = [];
+    for (let config of configs) {
+      config.selectapi && requestArr.push(config.selectapi);
+    }
+    try {
+      const [...response] = await Promise.all(
+        requestArr.map(item => api.getEnum(item).catch(err => err))
+      );
+      let index = 0;
+      for (let config of configs) {
+        if (config.selectapi) {
+          config.options = [];
+          for (let data of response[index]) {
+            config.options.push({
+              value: data.itemKey,
+              label: data.itemValue
+            });
+          }
+          index++;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return configs;
+  },
+
+  /**
    * @param {名称} 请求表格数据
    */
   async getConfigTable(configApi, ruleData) {

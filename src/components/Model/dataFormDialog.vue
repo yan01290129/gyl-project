@@ -1,6 +1,6 @@
 <template>
   <el-dialog class="formDialog" :close-on-click-modal="false" :title="title" :visible="visible" :before-close="handleClose">
-    <data-form v-loading='loading' ref="formDialog" :data.sync="data" :configs.sync="configs" @handlerInputChange='inputChange' @handlerPointSelection='pointSelection' @handlerSelectChange='selectChange' @handlerSwitchChange='switchChange' @handlerRadioChange='radioChange' @handlerOperation='operation'></data-form>
+    <data-form v-loading='loading' ref="formDialog" :data.sync="data" :configs.sync="configs" @handlerInputChange='inputChange' @handlerPointSelection='pointSelection' @handlerSelectChange='selectChange' @handlerSwitchChange='switchChange' @handlerRadioChange='radioChange' @handlerButtonClick='buttonClick' @handlerOperation='operation'></data-form>
 	<div class="operationDialogDiv">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>
@@ -59,6 +59,9 @@
 			},
 			radioChange(data, item) {
 			this.$emit("handlerRadioChange", data, item);
+			},
+			buttonClick(data, item) {
+				this.$emit("handlerButtonClick", data, item);
 			},
 			operation(val) {
 				this.$emit("handlerOperation", val);
