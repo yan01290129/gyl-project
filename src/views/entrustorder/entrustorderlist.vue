@@ -4,12 +4,9 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item><a href="#/entrustorderlist">委托订单</a></el-breadcrumb-item>
     </el-breadcrumb>
-    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='cellDblclick' @handlerRuleChange='ruleChange' @handlerRuleEvent='ruleEvent' @handlerOperation='operation'>
+    <data-table v-loading='loading' :data.sync="data" :count.sync="count" :configs.sync="configs" :ruleData.sync="ruleData" :ruleConfigs.sync="ruleConfigs" :operationConfigs='optionConfigs' @handlerCurrentSelected='currentSelected' @handlerCellDblclick='doubleClickSelected' @handlerRuleChange='ruleChange' @handlerRuleEvent='ruleEvent' @handlerOperation='operation'>
       <template #entrustOrderNo="slotProps">
         <el-tag type="success">{{slotProps.prop.entrustOrderNo}}</el-tag>
-      </template>
-      <template #statusName="slotProps">
-        <el-tag type="success">{{slotProps.prop.statusName}}</el-tag>
       </template>
     </data-table>
   </div>
@@ -39,34 +36,20 @@
 			// 获取搜索栏下拉
 			async loadConfigSelect(){
 				this.loading = true
-				this.ruleConfigs = await utils.setConfigTableRuleSelect(this.ruleConfigs)
+				await utils.setConfigTableRuleSelect(this.ruleConfigs)
 				this.loading = false
-			},
-			// 获取列表
-			async getTableList() {
-				try {
-					this.loading = true
-					let { list, count } = await utils.getConfigTable(this.configs.api, this.ruleData)
-					this.data = list
-					this.count = count
-				} catch (error) {
-					this.$message({ message: '获取数据失败', type: 'warning',center: true });
-					return Promise.reject(error)
-				} finally {
-					this.loading = false
-				}
-			},
-			// 修改搜索条件
-			ruleChange(ruleData) {
-				this.ruleData = ruleData
 			},
 			// 选中当前行
 			currentSelected(currentRow){
 				this.currentRow = currentRow
 			},
 			// 双击当前行
-			cellDblclick(currentRow){
+			doubleClickSelected(currentRow){
 				this.operation('upd')
+			},
+			// 修改搜索条件
+			ruleChange(ruleData) {
+				this.ruleData = ruleData
 			},
 			// 查询条件变更
 			ruleEvent(newVal, oldVal){
@@ -74,6 +57,20 @@
 					this.$set(this.ruleData,'pageIndex',1)
 				}else{
 					this.getTableList()
+				}
+			},
+			// 获取列表
+			async getTableList() {
+				try {
+					this.loading = true
+					const { list, count } = await utils.getConfigTable(this.configs.api, this.ruleData)
+					this.data = list
+					this.count = count
+				} catch (error) {
+					this.$message({ message: '获取数据失败', type: 'warning',center: true });
+					return Promise.reject(error)
+				} finally {
+					this.loading = false
 				}
 			},
 			// 操作按钮事件
@@ -101,8 +98,8 @@
 		},
 		created(){
 			// 初始化
-			this.ruleData = utils.inntTable()
 			this.loadConfigSelect()
+			utils.inntTable(this.ruleData)//utils.inntTable.call(this,this.ruleData)
 			this.getTableList()
 		},
 	};

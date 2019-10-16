@@ -37,8 +37,6 @@ import arrivalcountryRuleConfigs from "../arrivalcountry/rule";
 import materielorigin from "../materielorigin/table";
 import materieloriginRuleConfigs from "../materielorigin/rule";
 
-
-
 const TABLE_lIMIT = {
   clientContactName: {
     must: "clientCode",

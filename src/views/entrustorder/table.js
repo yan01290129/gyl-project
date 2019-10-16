@@ -10,7 +10,6 @@ export default {
     {
       prop: "statusName",
       label: "单据状态",
-      template:true
     },
     {
       prop: "trusteeName",

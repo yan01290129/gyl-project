@@ -3,6 +3,7 @@
     <div class="operationDiv" v-if="operationConfigs.length">
       <el-button :type="item.type" v-for="(item,index) in operationConfigs" :key="index" @click="operation(item.event)" size="small">{{item.label}}</el-button>
     </div>
+    <div style="min-height: 1px;"></div><!--避免浮动元素超出遮罩层-->
     <slot></slot>
     <el-form ref="form" :model.sync="data" label-position="right" size="small" label-width="140px">
       <template v-for="(config, i) in configs">
@@ -22,7 +23,7 @@
                       </el-select>
                     </el-input>
                     <!-- 日期框 -->
-                    <el-date-picker v-if="item.type == 'date'" v-model="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' type="date" @change='dateChange(data,item)' :placeholder="item.placeholder || '请选择日期'" value-format="yyyy-MM-dd"></el-date-picker>
+                    <el-date-picker v-if="item.type == 'date'" v-model="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' type="date" @change='dateChange(data,item)' :placeholder="item.placeholder || '请选择日期'" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
                     <!-- 下拉框 -->
                     <el-select v-if="item.type == 'select'" v-model="data[item.name]" :disabled="item.disabled" :readonly='item.readonly' @change='selectChange(data,item)' :placeholder="item.placeholder || '请选择内容'">
                       <el-option v-for="(option,index) in item.options" :key="index" :label="option['label']" :value="option['value']"></el-option>
@@ -81,11 +82,11 @@
                       </template>
                       <span v-else>*</span>
                     </i>
-                    <i v-if='item.type == "inputselect" || item.type == "numselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}</i>
+                    <i v-if='item.type == "inputselect" || item.type == "numselect"'>{{(data[item.selsect] && getlabelOfselect(item['options'],data[item.selsect]))?getlabelOfselect(item['options'],data[item.selsect]):'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name] || '*'}}</i>
                     <i v-if='item.type == "money"'>{{data[item.name]?(item['symbol'] || '$'):'*'}}{{data[item.name]}}</i>
-                    <i v-if='item.type == "moneyselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]?(item['symbol'] || '$'):'*'}}{{data[item.name]}}</i>
+                    <i v-if='item.type == "moneyselect"'>{{(data[item.selsect] && getlabelOfselect(item['options'],data[item.selsect]))?getlabelOfselect(item['options'],data[item.selsect]):'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]?(item['symbol'] || '$')+data[item.name]:'*'}}</i>
                     <i v-if='item.type == "percent"'>{{data[item.name]}}{{data[item.name]?'%':'*'}}</i>
-                    <i v-if='item.type == "percentselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]}}{{data[item.name]?'%':'*'}}</i>
+                    <label v-if='item.type == "percentselect"'>{{(data[item.selsect] && item['options'][data[item.selsect]])?item['options'][data[item.selsect]]["label"]:'*'}}<el-divider direction="vertical"></el-divider>{{data[item.name]?'%'+data[item.name]:'*'}}</label>
                   </el-form-item>
                 </template>
               </template>
@@ -149,6 +150,14 @@ export default {
 		operation(val) {
 			this.$emit("handlerOperation", val);
     },
+    // 获取下拉value的label
+    getlabelOfselect(options,value){
+      for (let i = 0; i < options.length; i++) {
+        if(options[i]['value'] == value){
+          return options[i]['label']
+        }
+      }
+    }
   }
 };
 </script>

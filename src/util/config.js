@@ -1,11 +1,12 @@
+import Vue from 'vue'
 import api from "@/api";
 export default {
   /**
    * @param {名称} 初始化表格条件
    */
   inntTable(ruleData = {}) {
-    !ruleData.pageIndex && (ruleData.pageIndex = 1),
-    !ruleData.pageSize && (ruleData.pageSize = 10);
+    !ruleData.pageIndex && (Vue.set(ruleData,'pageIndex',1)),
+    !ruleData.pageSize && (Vue.set(ruleData,'pageSize',10))
     return ruleData;
   },
 
@@ -86,6 +87,7 @@ export default {
   /**
    * @param {名称} 设置表单下拉字典数据
    */
+  selectOption: new Map(),
   async setConfigFormSelect(configs) {
     for await (let config of configs) {
       let requestArr = [];
@@ -100,7 +102,11 @@ export default {
       }
       try {
         const [...response] = await Promise.all(
-          requestArr.map(item => api.getEnum(item).catch(err => err))
+          requestArr.map(async item => {
+            const data = this.selectOption.get(item) ? this.selectOption.get(item) : await api.getEnum(item).catch(err => err)
+            this.selectOption.set(item, data)
+            return data;
+          })
         );
         let index = 0;
         for (let item of config.items) {
@@ -120,6 +126,16 @@ export default {
       }
     }
     return configs;
+  },
+
+  /**
+   * @param {名称} 修改表单为查看类型
+   */
+  setConfigFormOfText(configs) {
+    for (let config of configs) {
+      config.text = true
+    }
+    return configs
   },
 
   /**
@@ -143,16 +159,6 @@ export default {
           config.items[i] = {...config.items[i],...newItem}
         }
       }
-    }
-    return configs
-  },
-
-  /**
-   * @param {名称} 修改表单为查看类型
-   */
-  setConfigFormOfText(configs) {
-    for (let config of configs) {
-      config.text = true
     }
     return configs
   },
